@@ -1,0 +1,71 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: bitnami/kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
+    ports:
+      - "9092:9092"
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-der_pass}
+      - POSTGRES_USER=${POSTGRES_USER:-der_user}
+      - POSTGRES_DB=${POSTGRES_DB:-der_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    depends_on:
+      - mosquitto
+      - kafka
+      - timescaledb
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - KAFKA_BROKER=kafka:9092
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-der_user}:${POSTGRES_PASSWORD:-der_pass}@timescaledb:5432/${POSTGRES_DB:-der_db}
+    ports:
+      - "8000:8000"
+
+  simulator:
+    build: ./simulator
+    depends_on:
+      - mosquitto
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+
+  frontend:
+    build: ./frontend
+    environment:
+      - REACT_APP_MAPBOX_TOKEN=${MAPBOX_TOKEN}
+    ports:
+      - "3000:3000"
+
+volumes:
+  timescale_data:
