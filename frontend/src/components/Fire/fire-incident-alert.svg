@@ -1,0 +1,152 @@
+<svg id="Fire-Incident-Alert" width="1440" height="900" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1226"/>
+      <stop offset="100%" stop-color="#1B0F3B"/>
+    </linearGradient>
+    <radialGradient id="glowRed" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F87171" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#F87171" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowOrange" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      @font-face { font-family:'Montserrat'; src:local('Montserrat'); }
+      .ui { font-family:'Montserrat', Arial, sans-serif; }
+      .title { fill:#FEE2E2; font-weight:700; }
+      .text { fill:#E5E7EB; }
+      .panel { fill:rgba(10,17,37,0.8); stroke:#EF4444; stroke-opacity:.35; }
+      .chip { fill:#0F172A; stroke:#334155; stroke-width:1.2; }
+      .divider { stroke:#3B4252; stroke-width:1; opacity:.7; }
+      .btn { rx:14; fill:#0B1327; stroke-width:1.6; }
+      .btn-label { fill:#E6F3FF; font-weight:600; }
+      .chart { stroke:#F87171; fill:none; stroke-width:2; }
+    </style>
+  </defs>
+
+  <!-- background -->
+  <rect width="1440" height="900" fill="url(#bgDark)"/>
+  <circle cx="360" cy="120" r="240" fill="url(#glowRed)" opacity=".35"/>
+  <circle cx="1120" cy="720" r="280" fill="url(#glowOrange)" opacity=".35"/>
+
+  <!-- header -->
+  <g class="ui">
+    <rect x="24" y="24" width="1392" height="72" rx="16" class="chip"/>
+    <text x="48" y="70" class="title" style="font-size:24px">🔥 Fire Alert — Detected by Sensor F-207</text>
+    <text x="1180" y="70" class="text" style="font-size:16px">11:48:22 • UTC+02</text>
+  </g>
+
+  <!-- left: sensor data -->
+  <g class="ui" transform="translate(24,116)">
+    <rect width="800" height="560" rx="24" class="panel"/>
+    <text x="24" y="48" class="title" style="font-size:20px">Detection Data</text>
+    <line x1="20" y1="60" x2="780" y2="60" class="divider"/>
+
+    <text x="24" y="96" class="text" style="font-size:16px">
+      Sensor ID: <tspan fill="#F87171">F-207</tspan> • Type: <tspan fill="#FCD34D">Smoke + Temperature</tspan>
+    </text>
+    <text x="24" y="122" class="text" style="font-size:16px">
+      Location: <tspan fill="#E5E7EB">Building 3 – Warehouse Sector B</tspan>
+    </text>
+    <text x="24" y="148" class="text" style="font-size:16px">
+      Confidence: <tspan fill="#F87171">93%</tspan> • Last update: <tspan fill="#E5E7EB">4.2 sec ago</tspan>
+    </text>
+
+    <!-- charts -->
+    <g transform="translate(24,180)">
+      <text class="text" x="0" y="0" style="font-size:14px">Temperature (°C)</text>
+      <polyline class="chart"
+        points="0,140 40,130 80,125 120,140 160,180 200,210 240,230 280,260 320,240 360,220 400,210 440,200 480,195 520,190 560,188 600,185 640,183 680,182 720,180"/>
+      <text x="0" y="170" class="text" style="font-size:12px;opacity:.6">11:40</text>
+      <text x="660" y="170" class="text" style="font-size:12px;opacity:.6">11:48</text>
+    </g>
+
+    <g transform="translate(24,320)">
+      <text class="text" x="0" y="0" style="font-size:14px">Smoke Density (ppm)</text>
+      <polyline class="chart"
+        points="0,160 40,155 80,152 120,150 160,180 200,210 240,230 280,240 320,248 360,252 400,254 440,256 480,257 520,258 560,259 600,259 640,260 680,260 720,260"/>
+      <text x="0" y="190" class="text" style="font-size:12px;opacity:.6">11:40</text>
+      <text x="660" y="190" class="text" style="font-size:12px;opacity:.6">11:48</text>
+    </g>
+
+    <!-- AI assessment -->
+    <g transform="translate(24,480)">
+      <rect width="752" height="64" rx="12" class="chip"/>
+      <text x="20" y="40" class="text" style="font-size:18px">AI Fire Risk Model: 
+        <tspan fill="#F87171" font-weight="700">High (0.93)</tspan> • Likely source: <tspan fill="#FCD34D">Electrical Fault</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- right: map overview -->
+  <g class="ui" transform="translate(864,116)">
+    <rect width="552" height="560" rx="24" class="panel"/>
+    <text x="24" y="48" class="title" style="font-size:20px">Incident Map</text>
+    <line x1="24" y1="60" x2="528" y2="60" class="divider"/>
+
+    <!-- blueprint grid -->
+    <rect x="24" y="84" width="504" height="400" rx="18" fill="#0A1228" stroke="#F87171" stroke-opacity=".45"/>
+    <g transform="translate(24,84)">
+      <!-- walls -->
+      <path d="M40 60 L460 60 L460 380 L40 380 Z" stroke="#475569" stroke-width="2" fill="none"/>
+      <!-- rooms -->
+      <path d="M160 60 L160 380 M320 60 L320 380" stroke="#475569" stroke-width="1"/>
+      <path d="M40 180 L460 180 M40 300 L460 300" stroke="#475569" stroke-width="1"/>
+      <!-- sensor network -->
+      <circle cx="120" cy="240" r="8" fill="#F87171" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="136" y="244" class="text" style="font-size:12px">F-207</text>
+      <circle cx="120" cy="100" r="6" fill="#FCD34D" opacity=".5"/>
+      <circle cx="280" cy="240" r="6" fill="#FCD34D" opacity=".5"/>
+      <circle cx="420" cy="340" r="6" fill="#FCD34D" opacity=".5"/>
+      <!-- hydrants -->
+      <rect x="420" y="80" width="10" height="10" rx="2" fill="#22D3EE"/>
+      <text x="436" y="90" class="text" style="font-size:12px">Hydrant H-3</text>
+      <rect x="60" y="340" width="10" height="10" rx="2" fill="#22D3EE"/>
+      <text x="76" y="350" class="text" style="font-size:12px">Hydrant H-1</text>
+    </g>
+
+    <!-- status chip -->
+    <g transform="translate(24,504)">
+      <rect width="240" height="28" rx="8" class="chip"/>
+      <text x="12" y="20" class="text" style="font-size:14px">Status: <tspan fill="#F87171">Unconfirmed Fire</tspan></text>
+      <rect x="260" width="244" height="28" rx="8" class="chip"/>
+      <text x="272" y="20" class="text" style="font-size:14px">Nearest Unit: <tspan fill="#E5E7EB">Fire-Truck F-12</tspan></text>
+    </g>
+  </g>
+
+  <!-- bottom bar -->
+  <g class="ui" transform="translate(24,696)">
+    <rect width="1392" height="180" rx="20" class="chip"/>
+    <g transform="translate(24,20)">
+      <text x="0" y="26" class="title" style="font-size:18px">Actions</text>
+      <line x1="0" y1="34" x2="1344" y2="34" class="divider"/>
+
+      <g transform="translate(0,48)">
+        <g id="btn-verify" tabindex="0">
+          <rect class="btn" width="200" height="56" stroke="#FCD34D"/>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Verify Alert</text>
+        </g>
+      </g>
+      <g transform="translate(220,48)">
+        <g id="btn-dispatch" tabindex="0">
+          <rect class="btn" width="220" height="56" stroke="#F87171"/>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Dispatch Fire-Truck</text>
+        </g>
+      </g>
+      <g transform="translate(460,48)">
+        <g id="btn-ignore" tabindex="0">
+          <rect class="btn" width="200" height="56" stroke="#334155"/>
+          <text x="20" y="36" class="text" style="font-size:16px">Ignore (False Alarm)</text>
+        </g>
+      </g>
+      <g transform="translate(1100,48)">
+        <g id="btn-route" tabindex="0">
+          <rect class="btn" width="240" height="56" stroke="#22D3EE"/>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Open Live Route View</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

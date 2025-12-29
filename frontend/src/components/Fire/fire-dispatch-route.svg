@@ -1,0 +1,192 @@
+<svg id="Fire-Dispatch-Route" width="1440" height="900" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1226"/>
+      <stop offset="100%" stop-color="#1B0F3B"/>
+    </linearGradient>
+    <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#F87171"/>
+    </linearGradient>
+    <radialGradient id="smokePlume" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#F87171" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#F87171" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#F87171" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      @font-face { font-family:'Montserrat'; src: local('Montserrat'); }
+      .ui { font-family:'Montserrat', Arial, sans-serif; }
+      .title { fill:#FEE2E2; font-weight:700; }
+      .text { fill:#E5E7EB; }
+      .muted { fill:#A7B0C0; }
+      .chip { fill:#0F172A; stroke:#334155; stroke-width:1.2; }
+      .panel { fill:rgba(10,17,37,.80); stroke:#EF4444; stroke-opacity:.35; }
+      .divider { stroke:#2B3650; stroke-width:1; opacity:.7; }
+      .road-major { stroke:#E2EEFC; stroke-width:10; stroke-linecap:round; fill:none; opacity:.6; }
+      .road-minor { stroke:#BFD6FB; stroke-width:6; stroke-linecap:round; fill:none; opacity:.55; }
+      .road-closed { stroke:#991B1B; stroke-width:8; stroke-linecap:round; fill:none; stroke-dasharray:14 10; opacity:.8; }
+      .hydrant { fill:#22D3EE; }
+      .btn { rx:14; fill:#0B1327; stroke-width:1.6; }
+      .btn-label { fill:#E6F3FF; font-weight:600; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="url(#bgDark)"/>
+
+  <!-- Header -->
+  <g class="ui" id="Header">
+    <rect x="24" y="24" width="1392" height="64" rx="16" class="chip"/>
+    <text x="48" y="66" class="title" style="font-size:22px">Dispatch in Progress — Incident #F-207</text>
+    <g transform="translate(1010,34)">
+      <rect width="380" height="40" rx="12" class="chip"/>
+      <text x="16" y="26" class="text" style="font-size:14px">
+        Severity: <tspan fill="#F87171" font-weight="700">High</tspan> • Status: <tspan fill="#FCD34D">En-Route</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- Sidebar: Responding Units -->
+  <g class="ui" id="Sidebar" transform="translate(24,104)">
+    <rect width="360" height="772" rx="22" class="panel"/>
+    <text x="20" y="44" class="title" style="font-size:18px">Responding Units</text>
+    <line x1="20" y1="54" x2="340" y2="54" class="divider"/>
+
+    <!-- Unit rows -->
+    <g transform="translate(20,70)">
+      <!-- Row 1 (active) -->
+      <rect width="320" height="84" rx="12" fill="rgba(12,18,39,.95)" stroke="#F87171"/>
+      <text x="14" y="28" class="text" style="font-size:14px">Fire-Truck F-12</text>
+      <text x="14" y="52" class="title" style="font-size:16px">ETA 4 min</text>
+      <text x="140" y="52" class="muted" style="font-size:14px">Distance 2.1 km</text>
+      <text x="14" y="72" class="muted" style="font-size:12px">Water 86% • Crew 4/4 • Ladder</text>
+    </g>
+
+    <g transform="translate(20,164)">
+      <rect width="320" height="84" rx="12" fill="rgba(12,18,39,.85)" stroke="#334155"/>
+      <text x="14" y="28" class="text" style="font-size:14px">Engine E-07</text>
+      <text x="14" y="52" class="title" style="font-size:16px">ETA 7 min</text>
+      <text x="140" y="52" class="muted" style="font-size:14px">Distance 3.5 km</text>
+      <text x="14" y="72" class="muted" style="font-size:12px">Water 65% • Crew 3/4 • Foam</text>
+    </g>
+
+    <g transform="translate(20,258)">
+      <rect width="320" height="84" rx="12" fill="rgba(12,18,39,.85)" stroke="#334155"/>
+      <text x="14" y="28" class="text" style="font-size:14px">Rescue R-21</text>
+      <text x="14" y="52" class="title" style="font-size:16px">ETA 9 min</text>
+      <text x="140" y="52" class="muted" style="font-size:14px">Distance 4.2 km</text>
+      <text x="14" y="72" class="muted" style="font-size:12px">Tools: Jaws, Thermal Cam</text>
+    </g>
+
+    <!-- Legend -->
+    <g transform="translate(20,370)">
+      <text x="0" y="0" class="title" style="font-size:16px">Legend</text>
+      <g transform="translate(0,12)">
+        <line x1="0" y1="20" x2="34" y2="20" stroke="url(#routeGrad)" stroke-width="6" stroke-linecap="round"/>
+        <text x="44" y="24" class="text" style="font-size:12px">Route</text>
+      </g>
+      <g transform="translate(0,36)">
+        <line x1="0" y1="20" x2="34" y2="20" class="road-closed"/>
+        <text x="44" y="24" class="text" style="font-size:12px">Road Closed</text>
+      </g>
+      <g transform="translate(0,60)">
+        <rect x="0" y="12" width="10" height="10" rx="2" class="hydrant"/>
+        <text x="44" y="22" class="text" style="font-size:12px">Hydrant</text>
+      </g>
+      <g transform="translate(0,84)">
+        <rect x="0" y="12" width="16" height="16" rx="3" fill="#F87171"/>
+        <text x="44" y="24" class="text" style="font-size:12px">Incident</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Map Area -->
+  <g class="ui" id="Map" transform="translate(404,104)">
+    <rect width="1012" height="640" rx="22" class="panel"/>
+    <text x="20" y="44" class="title" style="font-size:18px">City Map — Route & Hydrants</text>
+    <line x1="20" y1="54" x2="992" y2="54" class="divider"/>
+
+    <!-- Map frame -->
+    <rect x="20" y="70" width="972" height="540" rx="18" fill="#0A1228" stroke="#F87171" stroke-opacity=".35"/>
+
+    <!-- Simplified city roads -->
+    <g transform="translate(20,70)">
+      <!-- major horizontals -->
+      <path d="M40 100 L340 110 L640 100 L920 120" class="road-major"/>
+      <path d="M60 260 L360 250 L680 300 L920 290" class="road-major"/>
+      <path d="M80 420 L360 410 L700 430 L930 440" class="road-major"/>
+
+      <!-- vertical spines -->
+      <path d="M180 60 L190 500" class="road-minor"/>
+      <path d="M520 60 L540 520" class="road-minor"/>
+      <path d="M820 80 L830 520" class="road-minor"/>
+
+      <!-- closed segment -->
+      <path d="M300 360 L460 350" class="road-closed"/>
+
+      <!-- hydrants -->
+      <rect x="870" y="150" width="10" height="10" rx="2" class="hydrant"/>
+      <text x="886" y="160" class="muted" style="font-size:12px">H-3</text>
+      <rect x="150" y="430" width="10" height="10" rx="2" class="hydrant"/>
+      <text x="166" y="440" class="muted" style="font-size:12px">H-1</text>
+      <rect x="560" y="310" width="10" height="10" rx="2" class="hydrant"/>
+      <text x="576" y="320" class="muted" style="font-size:12px">H-2</text>
+
+      <!-- incident pin + smoke plume -->
+      <g id="Incident" transform="translate(720,260)">
+        <circle r="110" fill="url(#smokePlume)"/>
+        <rect x="-8" y="-8" width="16" height="16" rx="3" fill="#F87171"/>
+        <text x="20" y="4" class="text" style="font-size:12px">Incident #F-207</text>
+      </g>
+
+      <!-- route path (from left-bottom to incident) -->
+      <path d="M120 480 C 220 440, 300 410, 380 390 S 540 350, 620 330 S 700 300, 720 260"
+            stroke="url(#routeGrad)" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+      <!-- fire truck icon (static on route) -->
+      <g id="Truck" transform="translate(540,350)">
+        <rect x="-26" y="-14" width="64" height="28" rx="6" fill="#F87171" stroke="#7F1D1D" stroke-width="2"/>
+        <rect x="6" y="-22" width="22" height="16" rx="3" fill="#FCA5A5" stroke="#7F1D1D" stroke-width="2"/>
+        <rect x="-18" y="-8" width="14" height="6" fill="#111827"/>
+        <rect x="8" y="-8" width="14" height="6" fill="#111827"/>
+        <circle cx="-8" cy="16" r="7" fill="#0B1327"/>
+        <circle cx="20" cy="16" r="7" fill="#0B1327"/>
+        <rect x="-2" y="-14" width="8" height="6" fill="#FCD34D"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom Actions -->
+  <g class="ui" id="Actions" transform="translate(404,760)">
+    <rect width="1012" height="116" rx="16" class="chip"/>
+    <g transform="translate(20,18)">
+      <text x="0" y="24" class="title" style="font-size:16px">Actions</text>
+      <line x1="0" y1="30" x2="972" y2="30" class="divider"/>
+
+      <g transform="translate(0,40)">
+        <g id="btn-arrived" tabindex="0">
+          <rect class="btn" width="200" height="48" stroke="#F87171"/>
+          <text x="20" y="30" class="btn-label" style="font-size:16px">Mark as Arrived</text>
+        </g>
+      </g>
+      <g transform="translate(220,40)">
+        <g id="btn-backup" tabindex="0">
+          <rect class="btn" width="210" height="48" stroke="#F59E0B"/>
+          <text x="20" y="30" class="btn-label" style="font-size:16px">Request Backup</text>
+        </g>
+      </g>
+      <g transform="translate(450,40)">
+        <g id="btn-sensors" tabindex="0">
+          <rect class="btn" width="230" height="48" stroke="#22D3EE"/>
+          <text x="20" y="30" class="btn-label" style="font-size:16px">View Building Sensors</text>
+        </g>
+      </g>
+      <g transform="translate(700,40)">
+        <g id="btn-close" tabindex="0">
+          <rect class="btn" width="230" height="48" stroke="#334155"/>
+          <text x="20" y="30" class="text" style="font-size:16px">Close Dispatch Panel</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,840 @@
+.city-administrator {
+    background-color: #ffffff;
+    display: flex;
+    min-height: 832px;
+    min-width: 1280px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.city-administrator .daily-report {
+    height: 832px;
+    margin-left: -5px;
+    overflow: hidden;
+    position: relative;
+    width: 1285px;
+}
+
+.city-administrator .vector {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.city-administrator .group {
+    height: 7.11%;
+    left: 0;
+    position: absolute;
+    top: 2.67%;
+    width: 96.98%;
+}
+
+.city-administrator .img {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 99.68%;
+}
+
+.city-administrator .text-wrapper {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 22px;
+    font-weight: 700;
+    height: 42.26%;
+    left: 0;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 31.80%;
+    white-space: nowrap;
+    width: 53.93%;
+}
+
+.city-administrator .div {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 14px;
+    font-weight: 400;
+    height: 27.04%;
+    left: 81.34%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 43.63%;
+    white-space: nowrap;
+    width: 13.80%;
+}
+
+.city-administrator .group-wrapper {
+    background-image: url(./vector-2.svg);
+    background-size: 100% 100%;
+    height: 6.22%;
+    left: 2.50%;
+    position: absolute;
+    top: 12.44%;
+    width: 95.00%;
+}
+
+.city-administrator .group-2 {
+    height: 50.00%;
+    position: relative;
+    top: 25.00%;
+    width: 59.13%;
+}
+
+.city-administrator .vector-2 {
+    height: 100.00%;
+    left: 0;
+    position: absolute;
+    top: -2.32%;
+    width: 27.20%;
+}
+
+.city-administrator .text-wrapper-2 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 18px;
+    font-weight: 700;
+    height: 6.01%;
+    left: 2.50%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 1.50%;
+    white-space: nowrap;
+    width: 20%;
+    font-size: 13px;
+
+/* End of generated CSS to fix truncated file */
+    font-weight: 400;
+    height: 57.95%;
+    left: 0;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 21.33%;
+    white-space: nowrap;
+    width: 25.63%;
+}
+
+.city-administrator .vector-3 {
+    height: 100.00%;
+    left: 29.58%;
+    position: absolute;
+    top: -2.32%;
+    width: 24.72%;
+}
+
+.city-administrator .text-wrapper-3 {
+    color: #c4b5fd;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 13px;
+    font-weight: 400;
+    height: 57.95%;
+    left: 31.17%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 21.33%;
+    white-space: nowrap;
+    width: 16.21%;
+}
+
+.city-administrator .vector-4 {
+    height: 100.00%;
+    left: 56.78%;
+    position: absolute;
+    top: -2.32%;
+    width: 18.54%;
+}
+
+.city-administrator .text-wrapper-4 {
+    color: #d6bcfa;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 54.09%;
+    left: 57.91%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 25.19%;
+    white-space: nowrap;
+    width: 16.76%;
+}
+
+.city-administrator .vector-5 {
+    height: 100.00%;
+    left: 76.56%;
+    position: absolute;
+    top: -2.32%;
+    width: 22.25%;
+}
+
+.city-administrator .text-wrapper-5 {
+    color: #d6bcfa;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 54.09%;
+    left: 78.41%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 25.19%;
+    white-space: nowrap;
+    width: 17.04%;
+}
+
+.city-administrator .group-3 {
+    height: 89px;
+    left: 32px;
+    position: absolute;
+    top: 174px;
+    width: 1217px;
+}
+
+.city-administrator .group-4 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 23.79%;
+}
+
+.city-administrator .vector-6 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 98.62%;
+}
+
+.city-administrator .text-wrapper-6 {
+    color: #c4b5fd;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 15.78%;
+    left: 4.79%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 20.51%;
+    white-space: nowrap;
+    width: 51.11%;
+}
+
+.city-administrator .text-wrapper-7 {
+    color: #ede9fe;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 28px;
+    font-weight: 700;
+    height: 34.93%;
+    left: 4.79%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 44.18%;
+    white-space: nowrap;
+    width: 20.03%;
+}
+
+.city-administrator .group-5 {
+    height: 100.00%;
+    left: 25.51%;
+    position: absolute;
+    top: 0;
+    width: 23.79%;
+}
+
+.city-administrator .text-wrapper-8 {
+    color: #c4b5fd;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 15.78%;
+    left: 4.95%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 20.51%;
+    white-space: nowrap;
+    width: 48.35%;
+}
+
+.city-administrator .text-wrapper-9 {
+    color: #ede9fe;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 28px;
+    font-weight: 700;
+    height: 34.93%;
+    left: 4.95%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 44.18%;
+    white-space: nowrap;
+    width: 43.51%;
+}
+
+.city-administrator .group-6 {
+    height: 100.00%;
+    left: 51.03%;
+    position: absolute;
+    top: 0;
+    width: 23.79%;
+}
+
+.city-administrator .text-wrapper-10 {
+    color: #c4b5fd;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 15.78%;
+    left: 4.76%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 20.51%;
+    white-space: nowrap;
+    width: 33.50%;
+}
+
+.city-administrator .text-wrapper-11 {
+    color: #ede9fe;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 28px;
+    font-weight: 700;
+    height: 34.93%;
+    left: 4.76%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 44.18%;
+    white-space: nowrap;
+    width: 24.87%;
+}
+
+.city-administrator .group-7 {
+    height: 100.00%;
+    left: 76.54%;
+    position: absolute;
+    top: 0;
+    width: 23.79%;
+}
+
+.city-administrator .text-wrapper-12 {
+    color: #c4b5fd;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 15.78%;
+    left: 4.92%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 20.51%;
+    white-space: nowrap;
+    width: 41.44%;
+}
+
+.city-administrator .text-wrapper-13 {
+    color: #ede9fe;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 28px;
+    font-weight: 700;
+    height: 35.42%;
+    left: 4.93%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 43.75%;
+    white-space: nowrap;
+    width: 5.55%;
+}
+
+.city-administrator .group-8 {
+    height: 333px;
+    left: 32px;
+    position: absolute;
+    top: 277px;
+    width: 1232px;
+}
+
+.city-administrator .group-9 {
+    height: 99.90%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 52.13%;
+}
+
+.city-administrator .vector-7 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 97.82%;
+}
+
+.city-administrator .text-wrapper-14 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 18px;
+    font-weight: 700;
+    height: 6.01%;
+    left: 3.41%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 5.01%;
+    white-space: nowrap;
+    width: 44.07%;
+}
+
+.city-administrator .vector-8 {
+    height: 0;
+    left: 2.22%;
+    object-fit: cover;
+    position: absolute;
+    top: 12.07%;
+    width: 93.37%;
+}
+
+.city-administrator .vector-9 {
+    height: 62.22%;
+    left: 8.81%;
+    position: absolute;
+    top: 22.22%;
+    width: 0;
+}
+
+.city-administrator .vector-10 {
+    height: 0;
+    left: 8.89%;
+    object-fit: cover;
+    position: absolute;
+    top: 84.29%;
+    width: 82.26%;
+}
+
+.city-administrator .vector-11 {
+    height: 34.44%;
+    left: 13.34%;
+    position: absolute;
+    top: 50.00%;
+    width: 6.11%;
+}
+
+.city-administrator .vector-12 {
+    height: 51.11%;
+    left: 23.34%;
+    position: absolute;
+    top: 33.33%;
+    width: 6.11%;
+}
+
+.city-administrator .vector-13 {
+    height: 26.11%;
+    left: 33.35%;
+    position: absolute;
+    top: 58.33%;
+    width: 6.11%;
+}
+
+.city-administrator .vector-14 {
+    height: 40.00%;
+    left: 43.35%;
+    position: absolute;
+    top: 44.44%;
+    width: 6.11%;
+}
+
+.city-administrator .vector-15 {
+    height: 21.94%;
+    left: 53.36%;
+    position: absolute;
+    top: 62.50%;
+    width: 6.11%;
+}
+
+.city-administrator .vector-16 {
+    height: 45.56%;
+    left: 63.36%;
+    position: absolute;
+    top: 38.89%;
+    width: 6.11%;
+}
+
+.city-administrator .text-wrapper-15 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.21%;
+    left: 12.44%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.74%;
+    white-space: nowrap;
+    width: 7.63%;
+}
+
+.city-administrator .text-wrapper-16 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.21%;
+    left: 24.12%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.74%;
+    white-space: nowrap;
+    width: 4.67%;
+}
+
+.city-administrator .text-wrapper-17 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.21%;
+    left: 33.77%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.74%;
+    white-space: nowrap;
+    width: 5.76%;
+}
+
+.city-administrator .text-wrapper-18 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.21%;
+    left: 43.42%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.74%;
+    white-space: nowrap;
+    width: 6.70%;
+}
+
+.city-administrator .text-wrapper-19 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.21%;
+    left: 51.52%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.74%;
+    white-space: nowrap;
+    width: 9.65%;
+}
+
+.city-administrator .text-wrapper-20 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.21%;
+    left: 63.98%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.74%;
+    white-space: nowrap;
+    width: 6.23%;
+}
+
+.city-administrator .text-wrapper-21 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 18px;
+    font-weight: 700;
+    height: 6.01%;
+    left: 3.52%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 5.11%;
+    white-space: nowrap;
+    width: 44.46%;
+}
+
+.city-administrator .vector-17 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 97.65%;
+}
+
+.city-administrator .vector-18 {
+    height: 0;
+    left: 4.70%;
+    object-fit: cover;
+    position: absolute;
+    top: 12.16%;
+    width: 92.45%;
+}
+
+.city-administrator .vector-19 {
+    height: 62.18%;
+    left: 4.61%;
+    position: absolute;
+    top: 22.52%;
+    width: 0;
+}
+
+.city-administrator .vector-20 {
+    height: 0;
+    left: 4.70%;
+    object-fit: cover;
+    position: absolute;
+    top: 84.56%;
+    width: 88.64%;
+}
+
+.city-administrator .vector-21 {
+    height: 27.76%;
+    left: 4.67%;
+    position: absolute;
+    top: 52.82%;
+    width: 88.64%;
+}
+
+.city-administrator .vector-22 {
+    height: 0;
+    left: 12.63%;
+    position: absolute;
+    top: 79.99%;
+    width: 0;
+}
+
+.city-administrator .vector-23 {
+    height: 0;
+    left: 21.02%;
+    position: absolute;
+    top: 74.99%;
+    width: 0;
+}
+
+.city-administrator .vector-24 {
+    height: 0;
+    left: 29.40%;
+    position: absolute;
+    top: 71.66%;
+    width: 0;
+}
+
+.city-administrator .vector-25 {
+    height: 0;
+    left: 37.79%;
+    position: absolute;
+    top: 66.66%;
+    width: 0;
+}
+
+.city-administrator .vector-26 {
+    height: 0;
+    left: 46.17%;
+    position: absolute;
+    top: 68.33%;
+    width: 0;
+}
+
+.city-administrator .vector-27 {
+    height: 0;
+    left: 54.56%;
+    position: absolute;
+    top: 60.56%;
+    width: 0;
+}
+
+.city-administrator .vector-28 {
+    height: 0;
+    left: 62.94%;
+    position: absolute;
+    top: 57.78%;
+    width: 0;
+}
+
+.city-administrator .vector-29 {
+    height: 0;
+    left: 71.33%;
+    position: absolute;
+    top: 62.78%;
+    width: 0;
+}
+
+.city-administrator .vector-30 {
+    height: 0;
+    left: 79.71%;
+    position: absolute;
+    top: 55.00%;
+    width: 0;
+}
+
+.city-administrator .vector-31 {
+    height: 0;
+    left: 88.09%;
+    position: absolute;
+    top: 58.33%;
+    width: 0;
+}
+
+.city-administrator .vector-32 {
+    height: 0;
+    left: 92.89%;
+    position: absolute;
+    top: 52.23%;
+    width: 0;
+}
+
+.city-administrator .text-wrapper-22 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.20%;
+    left: 11.91%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.79%;
+    white-space: nowrap;
+    width: 2.85%;
+}
+
+.city-administrator .text-wrapper-23 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.20%;
+    left: 28.69%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.79%;
+    white-space: nowrap;
+    width: 3.02%;
+}
+
+.city-administrator .text-wrapper-24 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.20%;
+    left: 45.64%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.79%;
+    white-space: nowrap;
+    width: 2.68%;
+}
+
+.city-administrator .text-wrapper-25 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.20%;
+    left: 62.42%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.79%;
+    white-space: nowrap;
+    width: 3.36%;
+}
+
+.city-administrator .text-wrapper-26 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.20%;
+    left: 79.19%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.79%;
+    white-space: nowrap;
+    width: 3.02%;
+}
+
+.city-administrator .text-wrapper-27 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 4.20%;
+    left: 91.78%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    top: 86.79%;
+    white-space: nowrap;
+    width: 2.68%;
+}
+
+.city-administrator .group-11 {
+    height: 20.44%;
+    left: 2.50%;
+    position: absolute;
+    top: 75.11%;
+    width: 98.59%;
+}
+
+.city-administrator .vector-33 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 75.51%;
+}
+
+.city-administrator .text-wrapper-28 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 18px;
+    font-weight: 700;
+    height: 6.01%;
+    left: 3.50%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 2.50%;
+    white-space: nowrap;
+    width: 40%;
+}

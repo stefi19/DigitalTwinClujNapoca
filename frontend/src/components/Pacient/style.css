@@ -1,0 +1,373 @@
+.pacient {
+    background-color: #ffffff;
+    display: flex;
+    min-height: 841px;
+    min-width: 1280px;
+    width: 100%;
+}
+
+.pacient .svg-ui-flux-pacient {
+    height: 842px;
+    margin-top: -1px;
+    position: relative;
+    width: 1280px;
+}
+
+.pacient .vector {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.pacient .img {
+    height: 94.67%;
+    left: 0;
+    position: absolute;
+    top: 2.67%;
+    width: 96.67%;
+}
+
+.pacient .group {
+    height: 71.11%;
+    left: 8.33%;
+    position: absolute;
+    top: 13.33%;
+    width: 81.94%;
+}
+
+.pacient .vector-2 {
+    height: 9.37%;
+    left: 2.82%;
+    position: absolute;
+    top: 0;
+    width: 81.36%;
+}
+
+.pacient .vector-3 {
+    height: 18.75%;
+    left: 0;
+    position: absolute;
+    top: 27.11%;
+    width: 100%;
+}
+
+.pacient .vector-4 {
+    height: 12.50%;
+    left: 0;
+    position: absolute;
+    top: 52.12%;
+    width: 91.53%;
+}
+
+.pacient .vector-5 {
+    height: 6.25%;
+    left: 7.90%;
+    position: absolute;
+    top: 80.24%;
+    width: 85.59%;
+}
+
+.pacient .vector-6 {
+    height: 93.75%;
+    left: 16.56%;
+    position: absolute;
+    top: 5.58%;
+    width: 5.08%;
+}
+
+.pacient .vector-7 {
+    height: 93.75%;
+    left: 48.77%;
+    position: absolute;
+    top: 2.46%;
+    width: 5.08%;
+}
+
+.pacient .vector-8 {
+    height: 90.62%;
+    left: 75.89%;
+    position: absolute;
+    top: 8.71%;
+    width: 0;
+}
+
+.pacient .vector-9 {
+    height: 6.67%;
+    left: 6.21%;
+    position: absolute;
+    top: 27.93%;
+    width: 75.69%;
+}
+
+.pacient .text-wrapper {
+    color: #1e40af;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 20px;
+    font-weight: 400;
+    height: 2.61%;
+    left: 51.41%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 28.03%;
+    white-space: nowrap;
+    width: 3.44%;
+}
+
+.pacient .active-route {
+    height: 37.78%;
+    left: 13.50%;
+    position: absolute;
+    top: 52.74%;
+    width: 58.33%;
+}
+
+.pacient .overlap-group {
+    height: 339px;
+    left: 169px;
+    position: absolute;
+    top: 438px;
+    width: 886px;
+}
+
+.pacient .PO-is {
+    height: 339px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 886px;
+}
+
+.pacient .div {
+    height: 6.08%;
+    left: 0;
+    position: absolute;
+    top: 93.92%;
+    width: 15.67%;
+}
+
+.pacient .vector-10 {
+    height: 90.91%;
+    left: 0;
+    position: absolute;
+    top: 4.23%;
+    width: 12.80%;
+}
+
+.pacient .text-wrapper-2 {
+    color: #1e3a8a;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 18px;
+    font-weight: 400;
+    height: 100.00%;
+    left: 14.08%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    width: 84.48%;
+}
+
+.pacient .group-2 {
+    height: 6.08%;
+    left: 40.12%;
+    position: absolute;
+    top: 38.67%;
+    width: 14.17%;
+}
+
+.pacient .vector-11 {
+    height: 90.91%;
+    left: 0;
+    position: absolute;
+    top: 4.23%;
+    width: 14.16%;
+}
+
+.pacient .text-wrapper-3 {
+    color: #1e3a8a;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 18px;
+    font-weight: 400;
+    height: 100.00%;
+    left: 15.58%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    width: 82.83%;
+}
+
+.pacient .group-3 {
+    height: 6.08%;
+    left: 62.19%;
+    position: absolute;
+    top: 22.10%;
+    width: 23.70%;
+}
+
+.pacient .vector-12 {
+    height: 90.91%;
+    left: 0;
+    position: absolute;
+    top: 4.23%;
+    width: 8.47%;
+}
+
+.pacient .text-wrapper-4 {
+    color: #1e3a8a;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 18px;
+    font-weight: 400;
+    height: 100%;
+    left: 9.31%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    width: 89.74%;
+}
+
+.pacient .group-4 {
+    height: 6.08%;
+    left: 84.25%;
+    position: absolute;
+    top: 0;
+    width: 15.97%;
+}
+
+.pacient .vector-13 {
+    height: 90.91%;
+    left: 0;
+    position: absolute;
+    top: 4.23%;
+    width: 12.56%;
+}
+
+.pacient .tailors-bastion {
+    color: #1e3a8a;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 18px;
+    font-weight: 400;
+    height: 100%;
+    left: 13.81%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    width: 84.77%;
+}
+
+.pacient .ambulance {
+    height: 52px;
+    left: 442px;
+    position: absolute;
+    top: 74px;
+    width: 59px;
+}
+
+.pacient .TL-unirii {
+    background-image: url(./vector-14.svg);
+    background-size: 100% 100%;
+    height: 5.78%;
+    left: 36.81%;
+    position: absolute;
+    top: 68.22%;
+    width: 0;
+}
+
+.pacient .img-2 {
+    height: 23.08%;
+    left: 20.00%;
+    position: absolute;
+    top: 11.54%;
+    width: 60.00%;
+}
+
+.pacient .img-3 {
+    height: 23.08%;
+    left: 20.00%;
+    position: absolute;
+    top: 38.46%;
+    width: 60.00%;
+}
+
+.pacient .img-4 {
+    height: 23.08%;
+    left: 20.00%;
+    position: absolute;
+    top: 65.38%;
+    width: 60.00%;
+}
+
+.pacient .TL-UBB {
+    background-image: url(./vector-15.svg);
+    background-size: 100% 100%;
+    height: 5.78%;
+    left: 53.47%;
+    position: absolute;
+    top: 59.33%;
+    width: 0;
+}
+
+.pacient .TL-bastion {
+    background-image: url(./vector-16.svg);
+    background-size: 100% 100%;
+    height: 5.78%;
+    left: 68.75%;
+    position: absolute;
+    top: 52.67%;
+    width: 0;
+}
+
+.pacient .group-5 {
+    height: 9.33%;
+    left: 2.78%;
+    position: absolute;
+    top: 4.44%;
+    width: 26.70%;
+}
+
+.pacient .vector-14 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 98.83%;
+}
+
+.pacient .text-wrapper-5 {
+    color: #ffffff;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 22px;
+    font-weight: 400;
+    height: 31.81%;
+    left: 5.10%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 5.83%;
+    white-space: nowrap;
+    width: 71.10%;
+}
+
+.pacient .ETA-min-moving-to {
+    color: #dbeafe;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 18px;
+    font-weight: 400;
+    height: 25.45%;
+    left: 5.10%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 44.00%;
+    white-space: nowrap;
+    width: 91.87%;
+}

@@ -1,0 +1,3 @@
+.pacient-control-button{background:#111827;color:#fff;border-radius:6px;padding:8px 12px;border:none;cursor:pointer}
+.pacient-control-button:disabled{opacity:.6;cursor:default}
+.pacient svg{max-width:100%;height:auto;display:block}

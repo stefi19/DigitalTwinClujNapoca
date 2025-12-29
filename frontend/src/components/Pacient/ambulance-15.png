@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- placeholder PNG (SVG content saved with .png extension so webpack import resolves during development) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="32" viewBox="0 0 64 32">
+  <rect width="64" height="32" fill="#fff7ed" stroke="#ffd7a0" rx="4"/>
+  <text x="32" y="20" font-size="10" font-family="Arial" fill="#9a3412" text-anchor="middle">ambulance-15</text>
+</svg>

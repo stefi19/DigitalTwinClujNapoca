@@ -1,0 +1,735 @@
+.doctor {
+    background-color: #ffffff;
+    display: flex;
+    min-height: 832px;
+    min-width: 1280px;
+    width: 100%;
+}
+
+.doctor .svg-ui-flux-pacient {
+    background-image: url(./vector.svg);
+    background-size: 100% 100%;
+    height: 832px;
+    position: relative;
+    width: 1280px;
+}
+
+.doctor .vector {
+    height: 53.33%;
+    left: 5.56%;
+    position: absolute;
+    top: 0;
+    width: 33.33%;
+}
+
+.doctor .img {
+    height: 66.67%;
+    left: 56.94%;
+    position: absolute;
+    top: 46.67%;
+    width: 41.67%;
+}
+
+.doctor .vector-2 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.doctor .modal {
+    height: 53.33%;
+    left: 25.00%;
+    position: absolute;
+    top: 23.33%;
+    width: 50.31%;
+}
+
+.doctor .vector-3 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 99.38%;
+}
+
+.doctor .text-wrapper {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 24px;
+    font-weight: 700;
+    height: 6.08%;
+    left: 3.88%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 6.28%;
+    white-space: nowrap;
+    width: 39.13%;
+}
+
+.doctor .div {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 14px;
+    font-weight: 400;
+    height: 3.61%;
+    left: 3.88%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 13.72%;
+    white-space: nowrap;
+    width: 60.71%;
+}
+
+.doctor .group {
+    height: 9.17%;
+    left: 3.86%;
+    position: absolute;
+    top: 20.00%;
+    width: 91.96%;
+}
+
+.doctor .vector-4 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 99.66%;
+}
+
+.doctor .vector-5 {
+    height: 27.27%;
+    left: 0;
+    position: absolute;
+    top: 36.36%;
+    width: 0;
+}
+
+.doctor .vector-6 {
+    height: 4.46%;
+    left: 4.62%;
+    position: absolute;
+    top: 33.54%;
+    width: 0;
+}
+
+.doctor .p {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 14px;
+    font-weight: 400;
+    height: 39.34%;
+    left: 8.12%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 24.88%;
+    white-space: nowrap;
+    width: 41.03%;
+}
+
+.doctor .group-2 {
+    height: 3.61%;
+    left: 3.86%;
+    position: absolute;
+    top: 29.49%;
+    width: 92.89%;
+}
+
+.doctor .text-wrapper-2 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 87.50%;
+    left: 0;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 12.50%;
+    white-space: nowrap;
+    width: 7.52%;
+}
+
+.doctor .text-wrapper-3 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 87.50%;
+    left: 27.93%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    width: 9.19%;
+}
+
+.doctor .text-wrapper-4 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 87.50%;
+    left: 40.14%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    width: 5.52%;
+}
+
+.doctor .text-wrapper-5 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 87.50%;
+    left: 50.00%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    width: 15.55%;
+}
+
+.doctor .vector-7 {
+    height: 0;
+    left: 0;
+    object-fit: cover;
+    position: absolute;
+    top: 91.85%;
+    width: 98.66%;
+}
+
+.doctor .row {
+    height: 14.17%;
+    left: 3.86%;
+    position: absolute;
+    top: 34.58%;
+    width: 92.27%;
+}
+
+.doctor .vector-8 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 99.33%;
+}
+
+.doctor .vector-9 {
+    height: 29.41%;
+    left: 0;
+    position: absolute;
+    top: 33.70%;
+    width: 2.99%;
+}
+
+.doctor .vector-10 {
+    height: 14.71%;
+    left: 0;
+    position: absolute;
+    top: 39.59%;
+    width: 0;
+}
+
+.doctor .text-wrapper-6 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 16px;
+    font-weight: 700;
+    height: 28.63%;
+    left: 4.06%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 34.06%;
+    white-space: nowrap;
+    width: 22.72%;
+}
+
+.doctor .group-3 {
+    height: 47.72%;
+    left: 28.12%;
+    position: absolute;
+    top: 26.10%;
+    width: 12.62%;
+}
+
+.doctor .vector-11 {
+    height: 100.00%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 97.33%;
+}
+
+.doctor .vector-12 {
+    height: 36.67%;
+    left: 5.33%;
+    position: absolute;
+    top: 30.00%;
+    width: 14.67%;
+}
+
+.doctor .text-wrapper-7 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 46.22%;
+    left: 21.33%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 23.33%;
+    white-space: nowrap;
+    width: 71.13%;
+}
+
+.doctor .text-wrapper-8 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 16px;
+    font-weight: 700;
+    height: 28.63%;
+    left: 40.91%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 32.47%;
+    white-space: nowrap;
+    width: 8.41%;
+}
+
+.doctor .group-4 {
+    height: 26px;
+    left: 293px;
+    position: absolute;
+    top: 18px;
+    width: 292px;
+}
+
+.doctor .group-5 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 34.83%;
+}
+
+.doctor .vector-13 {
+    height: 100.00%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 98.03%;
+}
+
+.doctor .text-wrapper-9 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 54.09%;
+    left: 10.39%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 24.98%;
+    white-space: nowrap;
+    width: 74.84%;
+}
+
+.doctor .group-6 {
+    height: 100%;
+    left: 37.80%;
+    position: absolute;
+    top: 0;
+    width: 32.39%;
+}
+
+.doctor .vector-14 {
+    height: 100.00%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 97.88%;
+}
+
+.doctor .text-wrapper-10 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 54.09%;
+    left: 11.41%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 23.18%;
+    white-space: nowrap;
+    width: 52.94%;
+}
+
+.doctor .group-7 {
+    height: 100%;
+    left: 73.17%;
+    position: absolute;
+    top: 0;
+    width: 27.52%;
+}
+
+.doctor .vector-15 {
+    height: 100.00%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 97.51%;
+}
+
+.doctor .text-wrapper-11 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 54.09%;
+    left: 13.30%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 23.18%;
+    white-space: nowrap;
+    width: 66.07%;
+}
+
+.doctor .row-b {
+    height: 14.17%;
+    left: 3.86%;
+    position: absolute;
+    top: 50.42%;
+    width: 92.27%;
+}
+
+.doctor .text-wrapper-12 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 16px;
+    font-weight: 700;
+    height: 30.22%;
+    left: 3.55%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 35.24%;
+    white-space: nowrap;
+    width: 24.57%;
+}
+
+.doctor .group-8 {
+    height: 47.06%;
+    left: 28.12%;
+    position: absolute;
+    top: 25.69%;
+    width: 11.95%;
+}
+
+.doctor .vector-16 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 97.18%;
+}
+
+.doctor .vector-17 {
+    height: 37.18%;
+    left: 5.63%;
+    position: absolute;
+    top: 30.42%;
+    width: 15.49%;
+}
+
+.doctor .text-wrapper-13 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 46.88%;
+    left: 30.99%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 20.28%;
+    white-space: nowrap;
+    width: 46.86%;
+}
+
+.doctor .text-wrapper-14 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 16px;
+    font-weight: 700;
+    height: 30.22%;
+    left: 40.91%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 35.24%;
+    white-space: nowrap;
+    width: 9.42%;
+}
+
+.doctor .group-9 {
+    height: 26px;
+    left: 293px;
+    position: absolute;
+    top: 18px;
+    width: 217px;
+}
+
+.doctor .group-10 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 46.82%;
+}
+
+.doctor .text-wrapper-15 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 54.09%;
+    left: 10.39%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 23.99%;
+    white-space: nowrap;
+    width: 74.84%;
+}
+
+.doctor .group-11 {
+    height: 100%;
+    left: 50.82%;
+    position: absolute;
+    top: 0;
+    width: 50.10%;
+}
+
+.doctor .vector-18 {
+    height: 100.00%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 98.16%;
+}
+
+.doctor .text-wrapper-16 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 54.09%;
+    left: 9.92%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 23.18%;
+    white-space: nowrap;
+    width: 63.50%;
+}
+
+.doctor .row-c {
+    height: 14.17%;
+    left: 3.86%;
+    position: absolute;
+    top: 66.25%;
+    width: 92.27%;
+}
+
+.doctor .text-wrapper-17 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 16px;
+    font-weight: 700;
+    height: 30.22%;
+    left: 3.89%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 34.83%;
+    white-space: nowrap;
+    width: 22.72%;
+}
+
+.doctor .group-12 {
+    height: 47.06%;
+    left: 28.12%;
+    position: absolute;
+    top: 26.87%;
+    width: 11.95%;
+}
+
+.doctor .text-wrapper-18 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 46.88%;
+    left: 30.99%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 20.28%;
+    white-space: nowrap;
+    width: 45.55%;
+}
+
+.doctor .text-wrapper-19 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 16px;
+    font-weight: 700;
+    height: 28.63%;
+    left: 41.75%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 33.24%;
+    white-space: nowrap;
+    width: 5.39%;
+}
+
+.doctor .group-13 {
+    height: 26px;
+    left: 292px;
+    position: absolute;
+    top: 13px;
+    width: 219px;
+}
+
+.doctor .group-14 {
+    height: 99.56%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 47.38%;
+}
+
+.doctor .vector-19 {
+    height: 100.00%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 98.07%;
+}
+
+.doctor .text-wrapper-20 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 50.22%;
+    left: 11.20%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 26.85%;
+    white-space: nowrap;
+    width: 59.41%;
+}
+
+.doctor .group-15 {
+    height: 100%;
+    left: 50.58%;
+    position: absolute;
+    top: 0;
+    width: 50.33%;
+}
+
+.doctor .vector-20 {
+    height: 100.00%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 98.18%;
+}
+
+.doctor .text-wrapper-21 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 12px;
+    font-weight: 400;
+    height: 50.00%;
+    left: 10.91%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 23.08%;
+    white-space: nowrap;
+    width: 59.09%;
+}
+
+.doctor .group-16 {
+    height: 10.00%;
+    left: 3.86%;
+    position: absolute;
+    top: 85.00%;
+    width: 44.24%;
+}
+
+.doctor .vector-21 {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 49.92%;
+}
+
+.doctor .text-wrapper-22 {
+    color: #e5e7eb;
+    font-family: "Montserrat-Bold", Helvetica;
+    font-size: 16px;
+    font-weight: 700;
+    height: 42.82%;
+    left: 6.36%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 30.86%;
+    white-space: nowrap;
+    width: 29.84%;
+}
+
+.doctor .vector-22 {
+    height: 100%;
+    left: 54.63%;
+    position: absolute;
+    top: 0;
+    width: 43.68%;
+}
+
+.doctor .text-wrapper-23 {
+    color: #a7b0c0;
+    font-family: "Montserrat-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    height: 42.82%;
+    left: 61.12%;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 30.86%;
+    white-space: nowrap;
+    width: 24.92%;
+}

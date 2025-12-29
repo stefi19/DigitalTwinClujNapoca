@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <rect x="2" y="2" width="36" height="36" rx="6" fill="#FFF0F6" stroke="#B83280" stroke-width="2"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="8" fill="#B83280">v3</text>
+</svg>

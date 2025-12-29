@@ -1,0 +1,223 @@
+<svg id="Fire-Post-Incident-Summary" width="1440" height="900" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1226"/>
+      <stop offset="100%" stop-color="#1B0F3B"/>
+    </linearGradient>
+    <radialGradient id="glowOrange" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#FB923C" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#FB923C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowGreen" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#22C55E" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C55E" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      @font-face { font-family: 'Montserrat'; src: local('Montserrat'); }
+      .ui { font-family:'Montserrat', Arial, sans-serif; }
+      .title { fill:#E5E7EB; font-weight:700; }
+      .text { fill:#A7B0C0; }
+      .chip { fill:#0F172A; stroke:#334155; stroke-width:1.2; }
+      .panel { fill:rgba(10,17,37,.80); stroke:#EF4444; stroke-opacity:.30; }
+      .panel-green { fill:rgba(10,17,37,.80); stroke:#22C55E; stroke-opacity:.30; }
+      .divider { stroke:#2B3650; stroke-width:1; opacity:.7; }
+      .kpi { fill:rgba(12,18,39,.88); stroke:#26324A; }
+      .btn { rx:14; fill:#0B1327; stroke-width:1.6; }
+      .btn-label { fill:#E6F3FF; font-weight:600; }
+      .badge-ok { fill:#22C55E; }
+      .badge-warn { fill:#F59E0B; }
+      .badge-crit { fill:#F87171; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="url(#bgDark)"/>
+  <circle cx="320" cy="120" r="220" fill="url(#glowOrange)" opacity=".35"/>
+  <circle cx="1140" cy="760" r="300" fill="url(#glowGreen)" opacity=".40"/>
+
+  <!-- Header -->
+  <g class="ui" id="Header">
+    <rect x="24" y="24" width="1392" height="64" rx="16" class="chip"/>
+    <text x="48" y="66" class="title" style="font-size:22px">Post-Incident Summary — Incident #F-207</text>
+    <g transform="translate(980,34)">
+      <rect width="436" height="40" rx="12" class="chip"/>
+      <text x="16" y="26" class="text" style="font-size:14px">
+        Status: <tspan fill="#22C55E" font-weight="700">Contained</tspan> • Total Duration: <tspan fill="#E5E7EB">00:38:21</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- Left column: Timeline + Resources -->
+  <g class="ui" transform="translate(24,104)">
+    <!-- Timeline panel -->
+    <rect width="880" height="260" rx="22" class="panel"/>
+    <text x="24" y="42" class="title" style="font-size:20px">Incident Timeline</text>
+    <line x1="20" y1="52" x2="860" y2="52" class="divider"/>
+
+    <!-- Horizontal timeline -->
+    <g transform="translate(40,92)">
+      <!-- Axis -->
+      <line x1="0" y1="24" x2="800" y2="24" stroke="#22324D" stroke-width="2"/>
+      <!-- Steps -->
+      <g transform="translate(0,0)"><circle cx="0" cy="24" r="8" class="badge-crit"/><text x="-10" y="54" class="text" style="font-size:12px">11:42 Detect</text></g>
+      <g transform="translate(160,0)"><circle cx="0" cy="24" r="8" fill="#FB923C"/><text x="-22" y="54" class="text" style="font-size:12px">11:44 Dispatch</text></g>
+      <g transform="translate(330,0)"><circle cx="0" cy="24" r="8" fill="#FB923C"/><text x="-16" y="54" class="text" style="font-size:12px">11:49 En-Route</text></g>
+      <g transform="translate(470,0)"><circle cx="0" cy="24" r="8" fill="#F59E0B"/><text x="-14" y="54" class="text" style="font-size:12px">11:53 Arrive</text></g>
+      <g transform="translate(610,0)"><circle cx="0" cy="24" r="8" fill="#F59E0B"/><text x="-28" y="54" class="text" style="font-size:12px">11:56 Suppression</text></g>
+      <g transform="translate(800,0)"><circle cx="0" cy="24" r="8" class="badge-ok"/><text x="-26" y="54" class="text" style="font-size:12px">12:20 Contained</text></g>
+    </g>
+
+    <!-- Resource Usage -->
+    <g transform="translate(0,276)">
+      <rect width="880" height="290" rx="22" class="panel"/>
+      <text x="24" y="42" class="title" style="font-size:20px">Resource Usage</text>
+      <line x1="20" y1="52" x2="860" y2="52" class="divider"/>
+
+      <!-- KPIs -->
+      <g transform="translate(24,70)">
+        <g class="kpi">
+          <rect width="200" height="84" rx="12" class="kpi"/>
+          <text x="12" y="26" class="text" style="font-size:12px">Water Used</text>
+          <text x="12" y="56" class="title" style="font-size:22px">2,200 <tspan class="text" style="font-size:14px">L</tspan></text>
+        </g>
+        <g class="kpi" transform="translate(216,0)">
+          <rect width="200" height="84" rx="12" class="kpi"/>
+          <text x="12" y="26" class="text" style="font-size:12px">Foam Used</text>
+          <text x="12" y="56" class="title" style="font-size:22px">36 <tspan class="text" style="font-size:14px">kg</tspan></text>
+        </g>
+        <g class="kpi" transform="translate(432,0)">
+          <rect width="200" height="84" rx="12" class="kpi"/>
+          <text x="12" y="26" class="text" style="font-size:12px">On-Scene Time</text>
+          <text x="12" y="56" class="title" style="font-size:22px">00:27:04</text>
+        </g>
+        <g class="kpi" transform="translate(648,0)">
+          <rect width="200" height="84" rx="12" class="kpi"/>
+          <text x="12" y="26" class="text" style="font-size:12px">Crew Fatigue</text>
+          <text x="12" y="56" class="title" style="font-size:22px">Low</text>
+        </g>
+      </g>
+
+      <!-- Bars -->
+      <g transform="translate(24,168)">
+        <text x="0" y="0" class="text" style="font-size:12px">Water Tank (F-12)</text>
+        <rect x="0" y="10" width="400" height="12" rx="6" fill="#1F2937"/>
+        <rect x="0" y="10" width="344" height="12" rx="6" fill="#22C55E"/>
+        <text x="412" y="20" class="text" style="font-size:12px">86%</text>
+
+        <text x="0" y="44" class="text" style="font-size:12px">Foam Reserve (E-07)</text>
+        <rect x="0" y="54" width="400" height="12" rx="6" fill="#1F2937"/>
+        <rect x="0" y="54" width="260" height="12" rx="6" fill="#FB923C"/>
+        <text x="412" y="64" class="text" style="font-size:12px">65%</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Right column: Heatmap + Evidence + Report -->
+  <g class="ui" transform="translate(924,104)">
+    <!-- Heatmap / Building -->
+    <rect width="492" height="280" rx="22" class="panel-green"/>
+    <text x="24" y="42" class="title" style="font-size:20px">Post-Fire Heatmap</text>
+    <line x1="20" y1="52" x2="468" y2="52" class="divider"/>
+    <g transform="translate(24,70)">
+      <rect x="0" y="0" width="444" height="190" rx="14" fill="#0A1228" stroke="#22C55E" stroke-opacity=".35"/>
+      <!-- grid rooms -->
+      <path d="M0 60 L444 60 M0 120 L444 120" stroke="#2F3E5A" stroke-width="1"/>
+      <path d="M148 0 L148 190 M296 0 L296 190" stroke="#2F3E5A" stroke-width="1"/>
+      <!-- cooled zones -->
+      <rect x="10" y="10" width="128" height="50" rx="6" fill="#063A2F" opacity=".7"/>
+      <rect x="158" y="10" width="128" height="50" rx="6" fill="#0B4A2F" opacity=".7"/>
+      <rect x="306" y="10" width="128" height="50" rx="6" fill="#14532D" opacity=".7"/>
+      <rect x="10" y="70" width="128" height="50" rx="6" fill="#166534" opacity=".6"/>
+      <rect x="158" y="70" width="128" height="50" rx="6" fill="#14532D" opacity=".6"/>
+      <rect x="306" y="70" width="128" height="50" rx="6" fill="#1B5E2F" opacity=".6"/>
+      <!-- incident cell marker -->
+      <rect x="306" y="130" width="128" height="50" rx="6" fill="#0F172A" stroke="#22C55E"/>
+      <text x="316" y="160" class="text" style="font-size:12px">Origin Zone (cooled)</text>
+    </g>
+
+    <!-- Evidence -->
+    <g transform="translate(0,296)">
+      <rect width="492" height="214" rx="22" class="panel"/>
+      <text x="24" y="42" class="title" style="font-size:20px">Evidence & Media</text>
+      <line x1="20" y1="52" x2="468" y2="52" class="divider"/>
+
+      <!-- thumbnails -->
+      <g transform="translate(24,70)">
+        <rect width="130" height="90" rx="10" fill="#0A1228" stroke="#334155"/>
+        <text x="10" y="80" class="text" style="font-size:12px">Helmet Cam</text>
+      </g>
+      <g transform="translate(170,70)">
+        <rect width="130" height="90" rx="10" fill="#0A1228" stroke="#334155"/>
+        <text x="10" y="80" class="text" style="font-size:12px">Drone Still</text>
+      </g>
+      <g transform="translate(316,70)">
+        <rect width="130" height="90" rx="10" fill="#0A1228" stroke="#334155"/>
+        <text x="10" y="80" class="text" style="font-size:12px">CCTV Frame</text>
+      </g>
+
+      <!-- actions -->
+      <g transform="translate(24,172)">
+        <g id="btn-attach" tabindex="0">
+          <rect class="btn" width="180" height="36" stroke="#22C55E"/>
+          <text x="16" y="24" class="btn-label" style="font-size:14px">Attach Files</text>
+        </g>
+        <g id="btn-annotate" tabindex="0" transform="translate(196,0)">
+          <rect class="btn" width="180" height="36" stroke="#8B5CF6"/>
+          <text x="16" y="24" class="btn-label" style="font-size:14px">Annotate</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- Report -->
+    <g transform="translate(0,516)">
+      <rect width="492" height="250" rx="22" class="panel"/>
+      <text x="24" y="42" class="title" style="font-size:20px">Report & Next Steps</text>
+      <line x1="20" y1="52" x2="468" y2="52" class="divider"/>
+
+      <g transform="translate(24,70)">
+        <rect width="444" height="88" rx="12" class="kpi"/>
+        <text x="14" y="26" class="text" style="font-size:14px">AI Assessment</text>
+        <text x="14" y="54" class="title" style="font-size:16px">Probable cause: Electrical fault • Prevention: wiring inspection, thermal audit</text>
+      </g>
+
+      <g transform="translate(24,168)">
+        <g id="btn-generate-report" tabindex="0">
+          <rect width="210" height="48" rx="12" class="btn" stroke="#22C55E"/>
+          <text x="16" y="30" class="btn-label" style="font-size:16px">Generate Report (PDF)</text>
+        </g>
+        <g id="btn-send-archive" tabindex="0" transform="translate(230,0)">
+          <rect width="238" height="48" rx="12" class="btn" stroke="#8B5CF6"/>
+          <text x="16" y="30" class="btn-label" style="font-size:16px">Send to Archive / Authority</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom actions -->
+  <g class="ui" transform="translate(24,740)">
+    <rect width="1392" height="136" rx="20" class="chip"/>
+    <g transform="translate(24,18)">
+      <text x="0" y="24" class="title" style="font-size:18px">Actions</text>
+      <line x1="0" y1="30" x2="1344" y2="30" class="divider"/>
+
+      <g transform="translate(0,42)">
+        <g id="btn-mark-closed" tabindex="0">
+          <rect class="btn" width="180" height="56" stroke="#22C55E"/>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Mark as Closed</text>
+        </g>
+        <g id="btn-notify-invest" tabindex="0" transform="translate(196,0)">
+          <rect class="btn" width="210" height="56" stroke="#F59E0B"/>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Notify Investigation</text>
+        </g>
+        <g id="btn-add-notes" tabindex="0" transform="translate(424,0)">
+          <rect class="btn" width="200" height="56" rx="12" class="btn" stroke="#334155"/>
+          <text x="20" y="36" class="text" style="font-size:16px">Add Notes</text>
+        </g>
+        <g id="btn-open-analytics" tabindex="0" transform="translate(1020,0)">
+          <rect class="btn" width="320" height="56" stroke="#22D3EE"/>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Open Historical Analytics</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
