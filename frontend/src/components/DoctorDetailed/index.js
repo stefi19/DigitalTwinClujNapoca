@@ -55,8 +55,8 @@ export default function DoctorDetailed() {
 
   // SSE subscription (assumes CRA proxy or same-origin backend)
   useEventSource('/stream/incidents', (inc) => {
-    // Only care about medical incidents in this view and only if they are complete
-    if (!inc || inc.type !== 'medical' || !isCompleteIncident(inc)) return
+    // Only care about medical incidents in this view; include incomplete incidents
+    if (!inc || inc.type !== 'medical') return
     setIncidents((prev) => {
       // if incoming incident is still new, add/update it; otherwise remove it (it moved to assign/resolved/etc.)
       const status = inc.status || 'new'
@@ -90,10 +90,9 @@ export default function DoctorDetailed() {
       try {
         const res = await axios.get('/incidents')
         if (!mounted) return
-        // Only show medical incidents that are "new" and have the required UI fields populated
+        // Show medical incidents that are "new" (include incomplete ones; UI will indicate missing fields)
         const items = (res.data || [])
           .filter(i => i.type === 'medical' && (i.status === 'new' || !i.status))
-          .filter(i => isCompleteIncident(i))
         setIncidents(items)
       } catch (err) {
         console.warn('Failed to load incidents', err)

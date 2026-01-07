@@ -68,6 +68,18 @@
 .btn.resolve{ background:var(--accent-yellow); color:#111 } 
 .btn:disabled{ opacity:0.6; cursor:not-allowed }
 
+/* Badge for incomplete/partial incidents */
+.badge {
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:12px;
+    background: rgba(245,158,11,0.12);
+    color:#F97316;
+    font-size:12px;
+    font-weight:600;
+}
+.missing-list{ color:var(--muted); font-size:12px; margin-top:6px }
+
 /* Responsive: stack on small screens */
 @media (max-width: 800px) {
   .doctor-detailed-root{ flex-direction:column }

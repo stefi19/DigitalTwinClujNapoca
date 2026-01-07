@@ -45,8 +45,8 @@ export default function FireAlertDetailed() {
   }
 
   useEventSource('/stream/incidents', (inc) => {
-    // ignore non-fire or incomplete fire events
-    if (!inc || inc.type !== 'fire' || !isCompleteFire(inc)) return
+    // ignore non-fire events; include incomplete fire incidents so UI can show missing data
+    if (!inc || inc.type !== 'fire') return
     setIncidents((prev) => {
       const status = inc.status || 'new'
       if (status === 'new') {
@@ -76,9 +76,9 @@ export default function FireAlertDetailed() {
       try {
         const res = await axios.get('/incidents')
         if (!mounted) return
+        // include fire incidents even if incomplete; we'll surface missing fields in UI
         const items = (res.data || [])
           .filter(i => i.type === 'fire' && (i.status === 'new' || !i.status))
-          .filter(i => isCompleteFire(i))
         // normalize some fields for UI convenience
         const norm = items.map(i => ({
           ...i,
@@ -127,6 +127,16 @@ export default function FireAlertDetailed() {
     const st = (inc.sensor_type || '').toLowerCase()
     if (st.includes('temperature') || st.includes('co') || st.includes('smoke')) return 'Medium'
     return 'Unknown'
+  }
+
+  function missingFields(inc) {
+    if (!inc) return []
+    const need = []
+    if (!inc.sensor_id) need.push('sensor_id')
+    if (!inc.sensor_type) need.push('sensor_type')
+    if (!inc.contact) need.push('contact')
+    if (!inc.address && !(inc.lat && inc.lon) && !(inc.location && (inc.location.address || (inc.location.lat && inc.location.lon)))) need.push('location')
+    return need
   }
 
   async function performAction(id, action) {
@@ -189,19 +199,25 @@ export default function FireAlertDetailed() {
           {applyFiltersAndSort(incidents).length===0 ? (
             <div className="empty">No fire alerts</div>
           ) : (
-            applyFiltersAndSort(incidents).map(inc => (
-              <div key={inc.id} className={`fire-item ${selected && selected.id===inc.id ? 'selected' : ''}`} onClick={()=>selectIncident(inc.id)}>
-                <div className="row-top">
-                  <div className="title">{inc.type}</div>
-                  <div className={`pill ${inc.status || 'new'}`}>{inc.status || 'new'}</div>
+            applyFiltersAndSort(incidents).map(inc => {
+              const missing = missingFields(inc)
+              return (
+                <div key={inc.id} className={`fire-item ${selected && selected.id===inc.id ? 'selected' : ''}`} onClick={()=>selectIncident(inc.id)}>
+                  <div className="row-top">
+                    <div className="title">{inc.type}</div>
+                    <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                      <div className={`pill ${inc.status || 'new'}`}>{inc.status || 'new'}</div>
+                      {missing.length>0 && <div className="badge">Missing: {missing.join(', ')}</div>}
+                    </div>
+                  </div>
+                  <div className="meta">{inc.received_at ? new Date(inc.received_at).toLocaleString() : ''}</div>
+                  <div className="summary">{inc.notes || inc.summary || '—'}</div>
+                  <div className="sensor-meta">
+                    <small>Sensor: {inc.sensor_id || '—'} · {inc.sensor_type || 'Unknown'}</small>
+                  </div>
                 </div>
-                <div className="meta">{inc.received_at ? new Date(inc.received_at).toLocaleString() : ''}</div>
-                        <div className="summary">{inc.notes || inc.summary || '—'}</div>
-                        <div className="sensor-meta">
-                          <small>Sensor: {inc.sensor_id || '—'} · {inc.sensor_type || 'Unknown'}</small>
-                        </div>
-              </div>
-            ))
+              )
+            })
           )}
         </aside>
 
