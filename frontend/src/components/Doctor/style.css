@@ -7,6 +7,26 @@
     width: 100%;
 }
 
+/* Shared UI controls (filters, selects, buttons) used by DoctorDetailed and Fire views */
+.filters{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-bottom:8px;
+}
+.filters label{ color:#9AA6B8; font-size:13px; display:flex; gap:6px; align-items:center; }
+.filters select{ background:#0b1220; border:1px solid rgba(255,255,255,0.04); color:#E6F3FF; padding:6px 8px; border-radius:8px; min-width:140px }
+.filters select:focus{ outline:none; box-shadow:0 0 0 4px rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.16) }
+
+.btn{ padding:8px 12px; border-radius:8px; border:0; cursor:pointer; transition:transform .08s ease, box-shadow .12s ease; box-shadow: 0 1px 0 rgba(2,6,23,0.2); font-weight:600 }
+.btn:hover:not(:disabled){ transform:translateY(-1px); box-shadow: 0 6px 18px rgba(2,6,23,0.12) }
+.btn:active:not(:disabled){ transform:translateY(0) }
+.btn:focus{ outline:none; box-shadow:0 0 0 4px rgba(59,130,246,0.08) }
+.btn.accept{ background: #0ea5a4; color:#fff }
+.btn.decline{ background:#ef4444; color:#fff }
+.btn.resolve{ background:#f59e0b; color:#111 }
+.btn:disabled{ opacity:0.6; cursor:not-allowed }
+
 .doctor .svg-ui-flux-pacient {
     height: 832px;
     position: relative;
