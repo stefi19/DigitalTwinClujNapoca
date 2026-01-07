@@ -400,6 +400,12 @@
     width: 88.28%;
 }
 
+/* Mini hydrant map */
+.mini-hydrant-root{ position:relative; height:260px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.03); }
+.mini-hydrant-map{ width:100%; height:100% }
+.mini-hydrant-note{ position:absolute; left:10px; bottom:10px; background: rgba(0,0,0,0.5); color:#fff; padding:6px 8px; border-radius:6px; font-size:13px }
+.mini-hydrant-empty{ color:var(--muted); padding:12px }
+
 .fire .vector-12 {
     height: 100%;
     left: 25.11%;

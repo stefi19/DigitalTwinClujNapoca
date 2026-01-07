@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import '../Doctor/style.css'
 
 export default function FireAlertDetailed() {
@@ -115,6 +117,121 @@ export default function FireAlertDetailed() {
 
   const selectIncident = (id) => setSelectedId(id)
   const selected = incidents.find((i) => i.id === selectedId) || incidents[0] || null
+
+  // hydrants dataset (sample points around Cluj center). In a real app these would come from a
+  // backend service or city dataset.
+  const HYDRANTS = [
+    { id: 'H-1', lon: 23.5985, lat: 46.7719 },
+    { id: 'H-2', lon: 23.6210, lat: 46.7690 },
+    { id: 'H-3', lon: 23.6102, lat: 46.7780 },
+    { id: 'H-4', lon: 23.5900, lat: 46.7680 },
+    { id: 'H-5', lon: 23.6055, lat: 46.7600 },
+  ]
+
+  // MiniHydrantMap: shows incident and nearest hydrants; draws simple lines and optionally uses Mapbox Directions for the nearest hydrant
+  function MiniHydrantMap({ incident }) {
+    const mapRef = useRef(null)
+    const containerRef = useRef(null)
+    const [status, setStatus] = useState('idle')
+
+    useEffect(() => {
+      const token = process.env.REACT_APP_MAPBOX_TOKEN || ''
+      const tokenMissing = !token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME'
+      if (tokenMissing) return
+      mapboxgl.accessToken = token
+      if (mapRef.current) return
+      try {
+        const m = new mapboxgl.Map({ container: containerRef.current, style: 'mapbox://styles/mapbox/streets-v11', center: [23.6,46.77], zoom: 13 })
+        mapRef.current = m
+        m.on('load', () => {
+          if (!m.getSource('hydrants')) {
+            m.addSource('hydrants', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+            m.addLayer({ id: 'hydrant-point', type: 'circle', source: 'hydrants', paint: { 'circle-radius': 8, 'circle-color': '#06b6d4' } })
+          }
+          if (!m.getSource('hydrant-lines')) {
+            m.addSource('hydrant-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+            m.addLayer({ id: 'hydrant-lines', type: 'line', source: 'hydrant-lines', paint: { 'line-color': '#ff7a18', 'line-width': 3 } })
+          }
+          if (!m.getSource('incident-point')) {
+            m.addSource('incident-point', { type: 'geojson', data: { type: 'Feature', geometry: null } })
+            m.addLayer({ id: 'incident-point-layer', type: 'circle', source: 'incident-point', paint: { 'circle-radius': 10, 'circle-color': '#ef4444' } })
+          }
+        })
+      } catch (e) { console.warn('MiniHydrantMap init failed', e) }
+      return () => { try { if (mapRef.current) mapRef.current.remove() } catch (e) {} }
+    }, [])
+
+    useEffect(() => {
+      if (!incident) return
+      const map = mapRef.current
+      const token = process.env.REACT_APP_MAPBOX_TOKEN || ''
+      const tokenMissing = !token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME'
+      // pick nearest 3 hydrants by haversine
+      const hx = HYDRANTS.map(h => ({ ...h, d: haversine([h.lon, h.lat], [incident.lon || incident.location?.lon || 0, incident.lat || incident.location?.lat || 0]) }))
+        .sort((a,b) => a.d - b.d).slice(0,3)
+
+      try {
+        if (map && map.getSource) {
+          const hydrFeatures = hx.map(h => ({ type: 'Feature', properties: { id: h.id, dist: Math.round(h.d) }, geometry: { type: 'Point', coordinates: [h.lon, h.lat] } }))
+          map.getSource('hydrants').setData({ type: 'FeatureCollection', features: hydrFeatures })
+          map.getSource('incident-point').setData({ type: 'Feature', geometry: { type: 'Point', coordinates: [incident.lon || incident.location?.lon || 0, incident.lat || incident.location?.lat || 0] } })
+          const lineFeatures = hx.map(h => ({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[h.lon, h.lat], [incident.lon || incident.location?.lon || 0, incident.lat || incident.location?.lat || 0]] } }))
+          map.getSource('hydrant-lines').setData({ type: 'FeatureCollection', features: lineFeatures })
+          // fit to bounds of hydrants + incident
+          const coords = [].concat(...lineFeatures.map(f => f.geometry.coordinates))
+          const lats = coords.map(c => c[1]); const lons = coords.map(c => c[0])
+          map.fitBounds([[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]], { padding: 40 })
+        }
+      } catch (e) { console.warn('MiniHydrantMap set data failed', e) }
+
+      // optionally compute directions for nearest hydrant -> incident for street path (1 request)
+      if (!tokenMissing && hx.length) {
+        (async () => {
+          try {
+            const h = hx[0]
+            const start = `${h.lon},${h.lat}`
+            const end = `${incident.lon || incident.location?.lon || 0},${incident.lat || incident.location?.lat || 0}`
+            const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${start};${end}?geometries=geojson&overview=full&access_token=${token}`
+            const r = await fetch(url)
+            if (!r.ok) throw new Error('Directions failed')
+            const data = await r.json()
+            if (data && data.routes && data.routes[0] && data.routes[0].geometry) {
+              const geom = data.routes[0].geometry
+              // add as a special layer to highlight street route
+              try {
+                if (!map.getSource('hydrant-street')) {
+                  map.addSource('hydrant-street', { type: 'geojson', data: geom })
+                  map.addLayer({ id: 'hydrant-street-line', type: 'line', source: 'hydrant-street', paint: { 'line-color': '#06b6d4', 'line-width': 4 } })
+                } else {
+                  map.getSource('hydrant-street').setData(geom)
+                }
+              } catch (e) { console.warn('Could not set hydrant street route', e) }
+            }
+          } catch (err) { console.warn('Hydrant directions failed', err) }
+        })()
+      }
+    }, [incident && incident.id])
+
+    const token = process.env.REACT_APP_MAPBOX_TOKEN || ''
+    if (!token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME') {
+      return (<div className="mini-hydrant-empty">Map disabled — set REACT_APP_MAPBOX_TOKEN and rebuild to enable hydrant map</div>)
+    }
+
+    return (
+      <div className="mini-hydrant-root">
+        <div ref={containerRef} className="mini-hydrant-map" />
+        <div className="mini-hydrant-note">Nearest hydrants highlighted</div>
+      </div>
+    )
+  }
+
+  function haversine([lon1, lat1], [lon2, lat2]) {
+    function toRad(v){return v * Math.PI / 180}
+    const R = 6371000
+    const dLat = toRad(lat2 - lat1); const dLon = toRad(lon2 - lon1)
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c
+  }
 
   function sensorSensitivityLabel(inc) {
     // derive a human-friendly sensitivity from severity or sensor_type
@@ -254,6 +371,12 @@ export default function FireAlertDetailed() {
                   <dd>{selected.severity || '—'}</dd>
                 </dl>
               </div>
+
+                  {/* hydrant map */}
+                  <div style={{marginTop:12}}>
+                    <h4>Nearest Hydrants</h4>
+                    <MiniHydrantMap incident={selected} />
+                  </div>
 
               <div className="detail-actions">
                 <button className="btn accept" onClick={()=>performAction(selected.id,'accept')} disabled={loadingAction!==null}>{loadingAction==='accept'?'Accepting…':'Accept'}</button>
