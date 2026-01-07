@@ -39,11 +39,24 @@ export default function DoctorDetailed() {
   const [incidents, setIncidents] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [loadingAction, setLoadingAction] = useState(null)
+  const [severityFilter, setSeverityFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('received_at')
+  const [sortDir, setSortDir] = useState('desc')
+
+  // Required UI fields for a medical incident to be considered "complete"
+  function isCompleteIncident(inc) {
+    if (!inc) return false
+    // patient name required, plus either patient_contact or contact, and an address or coords
+    const hasName = !!inc.patient_name || !!(inc.person && inc.person.name)
+    const hasContact = !!inc.patient_contact || !!inc.contact || !!(inc.person && inc.person.phone)
+    const hasLocation = !!inc.address || (!!inc.lat && !!inc.lon) || !!(inc.location && (inc.location.address || inc.location.lat || inc.location.lon))
+    return hasName && hasContact && hasLocation
+  }
 
   // SSE subscription (assumes CRA proxy or same-origin backend)
   useEventSource('/stream/incidents', (inc) => {
-    // Only care about medical incidents in this view
-    if (!inc || inc.type !== 'medical') return
+    // Only care about medical incidents in this view and only if they are complete
+    if (!inc || inc.type !== 'medical' || !isCompleteIncident(inc)) return
     setIncidents((prev) => {
       // if incoming incident is still new, add/update it; otherwise remove it (it moved to assign/resolved/etc.)
       const status = inc.status || 'new'
@@ -77,7 +90,10 @@ export default function DoctorDetailed() {
       try {
         const res = await axios.get('/incidents')
         if (!mounted) return
-        const items = (res.data || []).filter(i => i.type === 'medical' && (i.status === 'new' || !i.status))
+        // Only show medical incidents that are "new" and have the required UI fields populated
+        const items = (res.data || [])
+          .filter(i => i.type === 'medical' && (i.status === 'new' || !i.status))
+          .filter(i => isCompleteIncident(i))
         setIncidents(items)
       } catch (err) {
         console.warn('Failed to load incidents', err)
@@ -86,6 +102,32 @@ export default function DoctorDetailed() {
     load()
     return () => { mounted = false }
   }, [])
+
+  // apply UI filters and sorting to incidents list
+  function applyFiltersAndSort(list) {
+    if (!list) return []
+    let out = list.slice()
+    // severity filter: allow 'all' or numeric/severity strings
+    if (severityFilter && severityFilter !== 'all') {
+      const sf = severityFilter
+      out = out.filter(i => String(i.severity) === sf)
+    }
+    // sorting
+    out.sort((a, b) => {
+      let va = a[sortBy]
+      let vb = b[sortBy]
+      if (sortBy === 'received_at') {
+        va = va ? new Date(va).getTime() : 0
+        vb = vb ? new Date(vb).getTime() : 0
+      } else {
+        va = Number(va) || 0
+        vb = Number(vb) || 0
+      }
+      if (va === vb) return 0
+      return sortDir === 'asc' ? (va < vb ? -1 : 1) : (va > vb ? -1 : 1)
+    })
+    return out
+  }
 
   const selectIncident = (id) => {
     setSelectedId(id)
@@ -130,9 +172,33 @@ export default function DoctorDetailed() {
     <div className="doctor-detailed-root">
       <aside className="incident-list">
         <h3>Incidents</h3>
+        <div className="filters">
+          <label>Severity:
+            <select value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)}>
+              <option value="all">All</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </label>
+          <label>Sort by:
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <option value="received_at">Received</option>
+              <option value="severity">Severity</option>
+            </select>
+          </label>
+          <label>Direction:
+            <select value={sortDir} onChange={(e) => setSortDir(e.target.value)}>
+              <option value="desc">Newest / High→Low</option>
+              <option value="asc">Oldest / Low→High</option>
+            </select>
+          </label>
+        </div>
         <div className="list-scroll">
-          {incidents.length === 0 && <div className="empty">No incidents yet</div>}
-          {incidents.map((inc) => (
+          {applyFiltersAndSort(incidents).length === 0 && <div className="empty">No incidents yet</div>}
+          {applyFiltersAndSort(incidents).map((inc) => (
             <div
               key={inc.id}
               className={`incident-item ${selected && selected.id === inc.id ? 'selected' : ''}`}
@@ -140,9 +206,9 @@ export default function DoctorDetailed() {
             >
               <div className="meta">
                 <div className="type">{inc.type || 'unknown'}</div>
-                <div className="time">{inc.timestamp ? new Date(inc.timestamp).toLocaleString() : ''}</div>
+                <div className="time">{inc.received_at ? new Date(inc.received_at).toLocaleString() : ''}</div>
               </div>
-              <div className="summary">{inc.summary || inc.details || inc.location?.address || '—'}</div>
+              <div className="summary">{inc.summary || inc.details || inc.address || formatLatLon({ lat: inc.lat, lon: inc.lon }) || '—'}</div>
               <div className={`status ${inc.status || 'new'}`}>{inc.status || 'new'}</div>
             </div>
           ))}
@@ -157,7 +223,7 @@ export default function DoctorDetailed() {
             <header className="detail-header">
               <div>
                 <h2>{selected.type || 'Incident'}</h2>
-                <div className="sub">Reported: {selected.timestamp ? new Date(selected.timestamp).toLocaleString() : '—'}</div>
+                <div className="sub">Reported: {selected.received_at ? new Date(selected.received_at).toLocaleString() : '—'}</div>
               </div>
               <div className="right">
                 <div className="severity">Severity: {selected.severity || 'N/A'}</div>
@@ -168,12 +234,12 @@ export default function DoctorDetailed() {
             <section className="detail-body">
               <div className="row">
                 <div className="label">Location</div>
-                <div className="value">{selected.location?.address || formatLatLon(selected.location)}</div>
+                <div className="value">{selected.address || formatLatLon({ lat: selected.lat, lon: selected.lon })}</div>
               </div>
 
               <div className="row">
                 <div className="label">Patient / Subject</div>
-                <div className="value">{selected.person?.name || selected.patientName || '—'}</div>
+                <div className="value">{selected.patient_name || selected.person?.name || '—'}{selected.patient_age ? `, ${selected.patient_age} yrs` : ''}</div>
               </div>
 
               <div className="row">
@@ -183,7 +249,7 @@ export default function DoctorDetailed() {
 
               <div className="row">
                 <div className="label">Contact</div>
-                <div className="value">{selected.contact || (selected.person && selected.person.phone) || '—'}</div>
+                <div className="value">{selected.patient_contact || selected.contact || (selected.person && selected.person.phone) || '—'}</div>
               </div>
 
               <div className="row">

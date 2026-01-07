@@ -6,6 +6,9 @@ export default function FireAlertDetailed() {
   const [incidents, setIncidents] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [loadingAction, setLoadingAction] = useState(null)
+  const [severityFilter, setSeverityFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('received_at')
+  const [sortDir, setSortDir] = useState('desc')
 
   function useEventSource(url, onMessage) {
     const esRef = useRef(null)
@@ -88,6 +91,28 @@ export default function FireAlertDetailed() {
     return () => { mounted = false }
   }, [])
 
+  function applyFiltersAndSort(list) {
+    if (!list) return []
+    let out = list.slice()
+    if (severityFilter && severityFilter !== 'all') {
+      out = out.filter(i => String(i.severity) === severityFilter)
+    }
+    out.sort((a, b) => {
+      let va = a[sortBy]
+      let vb = b[sortBy]
+      if (sortBy === 'received_at') {
+        va = va ? new Date(va).getTime() : 0
+        vb = vb ? new Date(vb).getTime() : 0
+      } else {
+        va = Number(va) || 0
+        vb = Number(vb) || 0
+      }
+      if (va === vb) return 0
+      return sortDir === 'asc' ? (va < vb ? -1 : 1) : (va > vb ? -1 : 1)
+    })
+    return out
+  }
+
   const selectIncident = (id) => setSelectedId(id)
   const selected = incidents.find((i) => i.id === selectedId) || incidents[0] || null
 
@@ -137,10 +162,34 @@ export default function FireAlertDetailed() {
 
       <div className="fire-detailed-content">
         <aside className="fire-list">
-          {incidents.length===0 ? (
+          <div className="filters">
+            <label>Severity:
+              <select value={severityFilter} onChange={(e)=>setSeverityFilter(e.target.value)}>
+                <option value="all">All</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+            <label>Sort by:
+              <select value={sortBy} onChange={(e)=>setSortBy(e.target.value)}>
+                <option value="received_at">Received</option>
+                <option value="severity">Severity</option>
+              </select>
+            </label>
+            <label>Direction:
+              <select value={sortDir} onChange={(e)=>setSortDir(e.target.value)}>
+                <option value="desc">Newest / High→Low</option>
+                <option value="asc">Oldest / Low→High</option>
+              </select>
+            </label>
+          </div>
+          {applyFiltersAndSort(incidents).length===0 ? (
             <div className="empty">No fire alerts</div>
           ) : (
-            incidents.map(inc => (
+            applyFiltersAndSort(incidents).map(inc => (
               <div key={inc.id} className={`fire-item ${selected && selected.id===inc.id ? 'selected' : ''}`} onClick={()=>selectIncident(inc.id)}>
                 <div className="row-top">
                   <div className="title">{inc.type}</div>
