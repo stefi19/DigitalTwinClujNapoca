@@ -539,39 +539,53 @@ export default function InteractivePacient() {
       const rem = Math.max(0, (new Date(amb.eta).getTime() - Date.now())/1000);
       setEta(Math.ceil(rem));
     }
-    // if route exists, start progress animation along it
-    if (amb.route) {
-      startProgressForRoute(amb.route, amb, true);
-    } else {
-      // no route provided by backend: try to compute one client-side via Mapbox Directions (if token available)
-      const token = process.env.REACT_APP_MAPBOX_TOKEN || '';
-      const map = mapRef.current;
-      if (token && map) {
-        (async () => {
-          try {
-            const start = `${Number(amb.lon)},${Number(amb.lat)}`;
-            const end = `${patientLng},${patientLat}`;
-            const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${start};${end}?geometries=geojson&overview=full&access_token=${token}`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('Directions fetch failed');
-            const data = await res.json();
-            if (data && data.routes && data.routes[0] && data.routes[0].geometry) {
-              const geom = data.routes[0].geometry; // LineString
-              // show on map and start progress animation
-              try { map.getSource('route').setData({ type: 'FeatureCollection', features: [{ type: 'Feature', geometry: geom }] }); } catch(e){}
-                const ambWithEta = { ...amb, eta: data.routes[0].duration ? (new Date(Date.now() + data.routes[0].duration*1000)).toISOString() : amb.eta };
-                startProgressForRoute(geom, ambWithEta, true);
-            } else {
-              // fallback: stop any previous animation and rely on SSE updates
-              stopProgressAnimation(amb.ambulance_id);
-            }
-          } catch (err) {
-            console.warn('Could not compute client-side route', err);
-              stopProgressAnimation(amb.ambulance_id);
+    // Always prefer computing a street route client-side when a Mapbox token is available.
+    const token = process.env.REACT_APP_MAPBOX_TOKEN || '';
+    const map = mapRef.current;
+    const tokenMissing = !token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME';
+    if (!tokenMissing && map) {
+      (async () => {
+        try {
+          const start = `${Number(amb.lon)},${Number(amb.lat)}`;
+          const end = `${patientLng},${patientLat}`;
+          const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${start};${end}?geometries=geojson&overview=full&access_token=${token}`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('Directions fetch failed');
+          const data = await res.json();
+          if (data && data.routes && data.routes[0] && data.routes[0].geometry) {
+            const geom = data.routes[0].geometry; // LineString
+            // show on map and start progress animation
+            try { map.getSource('route').setData({ type: 'FeatureCollection', features: [{ type: 'Feature', geometry: geom }] }); } catch(e){}
+            // fit map to route bounds for automatic centering
+            try {
+              const coords = geom.coordinates;
+              const lats = coords.map(c => c[1]); const lons = coords.map(c => c[0]);
+              const minLat = Math.min(...lats); const maxLat = Math.max(...lats);
+              const minLon = Math.min(...lons); const maxLon = Math.max(...lons);
+              map.fitBounds([[minLon, minLat],[maxLon, maxLat]], { padding: 60 });
+            } catch (e) { /* ignore fit errors */ }
+            const ambWithEta = { ...amb, eta: data.routes[0].duration ? (new Date(Date.now() + data.routes[0].duration*1000)).toISOString() : amb.eta };
+            startProgressForRoute(geom, ambWithEta, true);
+            return;
           }
-        })();
+        } catch (err) {
+          console.warn('Could not compute client-side route', err);
+          // fallthrough to try using backend route or SSE
+        }
+        // If we reach here, try to use backend-provided route if available, otherwise clear route and stop animation
+        if (amb.route) {
+          try { map.getSource('route').setData({ type: 'FeatureCollection', features: [{ type: 'Feature', geometry: typeof amb.route === 'string' ? JSON.parse(amb.route) : amb.route }] }); } catch(e){}
+          startProgressForRoute(amb.route, amb, true);
         } else {
-        // clear any displayed route and rely on SSE updates for movement
+          try { if (map && map.getSource) map.getSource('route').setData({ type: 'FeatureCollection', features: [] }); } catch(e){}
+          stopProgressAnimation(amb.ambulance_id);
+        }
+      })();
+    } else {
+      // No Mapbox token or map unavailable: if backend provided a route, use it; otherwise fallback to SSE updates
+      if (amb.route) {
+        startProgressForRoute(amb.route, amb, true);
+      } else {
         try { if (map && map.getSource) map.getSource('route').setData({ type: 'FeatureCollection', features: [] }); } catch(e){}
         stopProgressAnimation(amb.ambulance_id);
       }
