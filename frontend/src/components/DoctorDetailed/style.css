@@ -1,3 +1,64 @@
+.doctor-detailed-root{
+  display:flex;
+  gap:16px;
+  padding:16px;
+  box-sizing:border-box;
+}
+
+.incident-list{
+  width:320px;
+  max-width:40%;
+  background: #fff;
+  border-radius:8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+}
+
+.incident-list h3{ margin:0 0 8px 0 }
+.list-scroll{ overflow:auto; max-height:72vh }
+.empty{ color:#777; padding:12px }
+
+.incident-item{ padding:10px; border-radius:6px; margin-bottom:8px; cursor:pointer; border:1px solid transparent }
+.incident-item:hover{ background: #fbfbff; border-color:#eef }
+.incident-item.selected{ background:#f0f7ff; border-color:#cfe0ff }
+.incident-item .meta{ display:flex; justify-content:space-between; font-size:12px; color:#555 }
+.incident-item .summary{ margin-top:6px; color:#222 }
+.incident-item .status{ margin-top:6px; font-size:12px; color:#666 }
+
+.incident-detail{ flex:1; min-width:220px }
+.no-selection{ color:#666; padding:24px }
+
+.detail-card{ background:#fff; padding:16px; border-radius:8px; box-shadow: 0 2px 10px rgba(0,0,0,0.06) }
+.detail-header{ display:flex; justify-content:space-between; align-items:center }
+.detail-header .sub{ color:#666; font-size:13px }
+.severity{ font-weight:600; color:#b33 }
+.pill{ padding:6px 10px; border-radius:16px; font-size:12px }
+.status-pill.new{ background:#eef6ff; color:#0366d6 }
+.status-pill.accept{ background:#e7ffef; color:#067a3b }
+.status-pill.decline{ background:#fff0f0; color:#a00 }
+.status-pill.resolve{ background:#fff8e6; color:#a55 }
+
+.detail-body{ margin-top:12px }
+.row{ display:flex; gap:12px; margin-bottom:12px }
+.label{ width:120px; color:#777; font-size:14px }
+.value{ flex:1 }
+.notes{ width:100%; min-height:80px; padding:8px; border-radius:6px; border:1px solid #eee }
+
+.detail-actions{ display:flex; gap:8px; margin-top:12px }
+.btn{ padding:10px 12px; border-radius:6px; border:0; cursor:pointer }
+.btn.accept{ background:#0b7a3f; color:#fff }
+.btn.decline{ background:#c63636; color:#fff }
+.btn.resolve{ background:#e89a00; color:#fff }
+.btn:disabled{ opacity:0.6; cursor:not-allowed }
+
+/* Responsive: stack on small screens */
+@media (max-width: 800px) {
+  .doctor-detailed-root{ flex-direction:column }
+  .incident-list{ width:100%; max-width:none }
+  .label{ width:110px }
+}
 .doctor {
     background-color: #ffffff;
     display: flex;

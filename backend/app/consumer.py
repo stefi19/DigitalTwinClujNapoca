@@ -69,10 +69,8 @@ def on_message(client, userdata, msg):
         payload = msg.payload.decode()
         data = json.loads(payload)
         data["received_at"] = datetime.utcnow().isoformat()
+        data.setdefault("status", "new")
         print("Received incident", data)
-
-        # append to in-memory store
-        incidents_store.append(data)
 
         # persist to DB
         try:
@@ -83,13 +81,21 @@ def on_message(client, userdata, msg):
                 lat=float(data.get("lat")),
                 lon=float(data.get("lon")),
                 severity=int(data.get("severity")),
-                received_at=datetime.fromisoformat(data.get("received_at"))
+                status=data.get("status", "new"),
+                notes=data.get("notes"),
+                received_at=datetime.fromisoformat(data.get("received_at")),
+                updated_at=datetime.utcnow()
             )
             db.add(inc)
             db.commit()
+            # Get the persisted incident with all fields
+            data = inc.to_dict()
             db.close()
         except Exception as e:
             print("DB write failed", e)
+
+        # append to in-memory store
+        incidents_store.insert(0, data)
 
         # produce to kafka for downstream processing
         try:
