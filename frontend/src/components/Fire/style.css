@@ -180,6 +180,10 @@
     top: 29.64%;
     width: 89.83%;
 }
+/* Ensure the fire-list panel is positioned so filters can be sticky and not overlap */
+.fire-list{ position:relative }
+.fire-list .filters{ position:sticky; top:8px; z-index:2; display:flex; gap:8px; flex-wrap:wrap; padding-bottom:6px }
+.fire-list .list-scroll{ padding-top:6px }
 
 .fire .text-wrapper-5 {
     color: #e5e7eb;
