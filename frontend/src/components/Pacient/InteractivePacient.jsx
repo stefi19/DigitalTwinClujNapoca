@@ -540,16 +540,19 @@ export default function InteractivePacient() {
       setEta(Math.ceil(rem));
     }
     // Always prefer computing a street route client-side when a Mapbox token is available.
-    const token = process.env.REACT_APP_MAPBOX_TOKEN || '';
-    const map = mapRef.current;
-    const tokenMissing = !token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME';
-    if (!tokenMissing && map) {
+  const token = process.env.REACT_APP_MAPBOX_TOKEN || '';
+  const map = mapRef.current;
+  const tokenMissing = !token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME';
+  // center map on ambulance immediately for quick feedback
+  try { if (map && amb.lon != null && amb.lat != null) map.flyTo({ center: [Number(amb.lon), Number(amb.lat)], zoom: 14 }) } catch(e) {}
+
+  if (!tokenMissing && map) {
       (async () => {
         try {
           const start = `${Number(amb.lon)},${Number(amb.lat)}`;
           const end = `${patientLng},${patientLat}`;
           const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${start};${end}?geometries=geojson&overview=full&access_token=${token}`;
-          const res = await fetch(url);
+            const res = await fetch(url);
           if (!res.ok) throw new Error('Directions fetch failed');
           const data = await res.json();
           if (data && data.routes && data.routes[0] && data.routes[0].geometry) {
