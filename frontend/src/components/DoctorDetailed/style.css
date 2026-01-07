@@ -75,6 +75,22 @@
 .btn.resolve{ background:var(--accent-yellow); color:#111 } 
 .btn:disabled{ opacity:0.6; cursor:not-allowed }
 
+/* Vitals panel */
+.detail-vitals{ margin-top:16px; padding:12px; background: rgba(255,255,255,0.02); border-radius:8px; border:1px solid rgba(255,255,255,0.03) }
+.detail-vitals h4{ margin:0 0 8px 0; font-size:14px }
+.v-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:8px }
+.v-item{ background: rgba(0,0,0,0.35); padding:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center }
+.v-label{ color:var(--muted); font-size:13px }
+.v-value{ font-weight:700; font-size:16px }
+.v-empty{ color:var(--muted) }
+
+/* Mini route map */
+.detail-route{ margin-top:12px }
+.mini-route-root{ position:relative; height:220px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.03) }
+.mini-route-map{ width:100%; height:100% }
+.mini-route-status{ position:absolute; left:10px; bottom:10px; background: rgba(0,0,0,0.5); color:#fff; padding:6px 8px; border-radius:6px; font-size:13px }
+.mini-route-empty{ color:var(--muted); padding:12px }
+
 /* Badge for incomplete/partial incidents */
 .badge {
     display:inline-block;

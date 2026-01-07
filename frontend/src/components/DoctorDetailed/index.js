@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import axios from 'axios'
 import './style.css'
 
@@ -134,6 +136,41 @@ export default function DoctorDetailed() {
 
   const selected = incidents.find((i) => i.id === selectedId) || incidents[0] || null
 
+  // --- Vitals simulation state (per selected patient) ---
+  const [vitals, setVitals] = useState(null)
+  const vitalsTimerRef = useRef(null)
+
+  // start/stop vitals simulation when selection changes
+  useEffect(() => {
+    // stop any previous timer
+    if (vitalsTimerRef.current) { clearInterval(vitalsTimerRef.current); vitalsTimerRef.current = null }
+    if (!selected) { setVitals(null); return }
+    // seed vitals from incident data if present, otherwise use defaults
+    const seed = {
+      hr: selected.vitals?.hr || 88,
+      spo2: selected.vitals?.spo2 || 96,
+      rr: selected.vitals?.rr || 18,
+      sys: selected.vitals?.sys || 120,
+      dia: selected.vitals?.dia || 78,
+    }
+    setVitals(seed)
+    // simulate small random walk every 1s
+    vitalsTimerRef.current = setInterval(() => {
+      setVitals((prev) => {
+        if (!prev) return seed
+        const jitter = (v, min, max) => Math.max(min, Math.min(max, Math.round(v + (Math.random() - 0.5) * (v * 0.06))))
+        return {
+          hr: jitter(prev.hr, 40, 160),
+          spo2: jitter(prev.spo2, 80, 100),
+          rr: jitter(prev.rr, 8, 40),
+          sys: jitter(prev.sys, 70, 220),
+          dia: jitter(prev.dia, 40, 130),
+        }
+      })
+    }, 1000)
+    return () => { if (vitalsTimerRef.current) { clearInterval(vitalsTimerRef.current); vitalsTimerRef.current = null } }
+  }, [selected && selected.id])
+
   // helper for optimistic actions
   async function performAction(id, action) {
     setLoadingAction(action)
@@ -268,6 +305,26 @@ export default function DoctorDetailed() {
               </div>
             </section>
 
+            {/* Vitals simulator panel (live-updating) */}
+            <section className="detail-vitals">
+              <h4>Live Vitals (simulated)</h4>
+              {!vitals && <div className="v-empty">No vitals available</div>}
+              {vitals && (
+                <div className="v-grid">
+                  <div className="v-item"><div className="v-label">HR</div><div className="v-value">{vitals.hr} bpm</div></div>
+                  <div className="v-item"><div className="v-label">SpO₂</div><div className="v-value">{vitals.spo2}%</div></div>
+                  <div className="v-item"><div className="v-label">RR</div><div className="v-value">{vitals.rr} /min</div></div>
+                  <div className="v-item"><div className="v-label">BP</div><div className="v-value">{vitals.sys}/{vitals.dia} mmHg</div></div>
+                </div>
+              )}
+            </section>
+
+            {/* Small route/map panel: draws Mapbox directions (streets) between nearest ambulance and patient */}
+            <section className="detail-route">
+              <h4>Route to patient</h4>
+              <MiniRouteMap incident={selected} />
+            </section>
+
             <footer className="detail-actions">
               <button
                 className="btn accept"
@@ -306,5 +363,110 @@ function formatLatLon(loc) {
   if (loc.lat && loc.lon) return `${loc.lat.toFixed(5)}, ${loc.lon.toFixed(5)}`
   if (loc.latitude && loc.longitude) return `${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}`
   return '—'
+}
+
+// MiniRouteMap: small embedded map that computes Mapbox Directions between the nearest ambulance and the incident
+function MiniRouteMap({ incident }) {
+  const mapRef = useRef(null)
+  const containerRef = useRef(null)
+  const routeLayer = 'doctor-route'
+  const [status, setStatus] = useState('idle')
+
+  useEffect(() => {
+    const token = process.env.REACT_APP_MAPBOX_TOKEN || ''
+    const tokenMissing = !token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME'
+    if (tokenMissing) return
+    mapboxgl.accessToken = token
+    if (mapRef.current) return
+    try {
+      const m = new mapboxgl.Map({ container: containerRef.current, style: 'mapbox://styles/mapbox/streets-v11', center: [23.6,46.77], zoom: 12 })
+      mapRef.current = m
+      m.on('load', () => {
+        if (!m.getSource('doctor-route')) {
+          m.addSource('doctor-route', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+          m.addLayer({ id: routeLayer, type: 'line', source: 'doctor-route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ff7a18', 'line-width': 5 } })
+        }
+      })
+    } catch (e) { console.warn('MiniRouteMap init failed', e) }
+    return () => { try { if (mapRef.current) mapRef.current.remove() } catch (e) {} }
+  }, [])
+
+  // when incident changes, fetch nearest ambulance and request directions
+  useEffect(() => {
+    if (!incident) return
+    const token = process.env.REACT_APP_MAPBOX_TOKEN || ''
+    const tokenMissing = !token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME'
+    if (tokenMissing) { setStatus('token-missing'); return }
+    const map = mapRef.current
+    if (!map) { setStatus('no-map'); return }
+
+    let cancelled = false
+    setStatus('computing')
+    ;(async () => {
+      try {
+        // fetch ambulances from backend and pick the nearest to the incident
+        const res = await fetch('/ambulances')
+        const list = await res.json()
+        if (cancelled) return
+        const patientPt = [(incident.lon || incident.location?.lon || 0), (incident.lat || incident.location?.lat || 0)]
+        // fallback: if no coords present, try parsing address won't be attempted here
+        const withCoords = (list || []).filter(a => a.lon != null && a.lat != null)
+        if (!withCoords.length) { setStatus('no-units'); return }
+        const nearest = withCoords.reduce((best, cur) => {
+          const dcur = haversine([Number(cur.lon), Number(cur.lat)], patientPt)
+          if (!best || dcur < best.d) return { item: cur, d: dcur }
+          return best
+        }, null)
+        if (!nearest) { setStatus('no-units'); return }
+        const amb = nearest.item
+        const start = `${Number(amb.lon)},${Number(amb.lat)}`
+        const end = `${Number(patientPt[0])},${Number(patientPt[1])}`
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${start};${end}?geometries=geojson&overview=full&access_token=${token}`
+        const r = await fetch(url)
+        if (!r.ok) throw new Error('Directions fetch failed')
+        const data = await r.json()
+        if (!data.routes || !data.routes[0]) throw new Error('No route returned')
+        const geom = data.routes[0].geometry
+        if (cancelled) return
+        try { map.getSource('doctor-route').setData({ type: 'FeatureCollection', features: [{ type: 'Feature', geometry: geom }] }) } catch (e) { console.warn('setData failed', e) }
+        // fit bounds
+        try {
+          const coords = geom.coordinates
+          const lats = coords.map(c => c[1]); const lons = coords.map(c => c[0])
+          const minLat = Math.min(...lats); const maxLat = Math.max(...lats)
+          const minLon = Math.min(...lons); const maxLon = Math.max(...lons)
+          map.fitBounds([[minLon, minLat],[maxLon, maxLat]], { padding: 40 })
+        } catch (e) { /* ignore fit errors */ }
+        setStatus('ok')
+      } catch (err) {
+        console.warn('MiniRouteMap error', err)
+        setStatus('error')
+      }
+    })()
+    return () => { cancelled = true }
+  }, [incident && incident.id])
+
+  const token = process.env.REACT_APP_MAPBOX_TOKEN || ''
+  if (!token || token === 'your_mapbox_token_here' || token === 'REPLACE_ME') {
+    return (<div className="mini-route-empty">Map disabled — set REACT_APP_MAPBOX_TOKEN and rebuild to enable route</div>)
+  }
+
+  return (
+    <div className="mini-route-root">
+      <div ref={containerRef} className="mini-route-map" />
+      <div className="mini-route-status">{status === 'computing' ? 'Computing route…' : status === 'no-units' ? 'No available units' : status === 'token-missing' ? 'Token missing' : status === 'error' ? 'Route failed' : ''}</div>
+    </div>
+  )
+}
+
+// small haversine helper (meters)
+function haversine([lon1, lat1], [lon2, lat2]) {
+  function toRad(v) { return v * Math.PI / 180 }
+  const R = 6371000
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
 }
 
