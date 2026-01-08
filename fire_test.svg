@@ -38,11 +38,11 @@
   <!-- Header -->
   <g class="ui" id="Header">
     <rect x="24" y="24" width="1392" height="64" rx="16" class="chip"/>
-    <text x="48" y="66" class="title" style="font-size:22px">Post-Incident Summary — Incident #F-207</text>
+    <text x="48" y="66" class="title" style="font-size:22px">Post-Incident Summary — Incident #inc_1767867380_512</text>
     <g transform="translate(980,34)">
       <rect width="436" height="40" rx="12" class="chip"/>
       <text x="16" y="26" class="text" style="font-size:14px">
-        Status: <tspan fill="#22C55E" font-weight="700">Contained</tspan> • Total Duration: <tspan fill="#E5E7EB">00:38:21</tspan>
+        Status: <tspan fill="#22C55E" font-weight="700">New</tspan> • Total Duration: <tspan fill="#E5E7EB">00:38:21</tspan>
       </text>
     </g>
   </g>
@@ -64,7 +64,7 @@
       <g transform="translate(330,0)"><circle cx="0" cy="24" r="8" fill="#FB923C"/><text x="-16" y="54" class="text" style="font-size:12px">11:49 En-Route</text></g>
       <g transform="translate(470,0)"><circle cx="0" cy="24" r="8" fill="#F59E0B"/><text x="-14" y="54" class="text" style="font-size:12px">11:53 Arrive</text></g>
       <g transform="translate(610,0)"><circle cx="0" cy="24" r="8" fill="#F59E0B"/><text x="-28" y="54" class="text" style="font-size:12px">11:56 Suppression</text></g>
-      <g transform="translate(800,0)"><circle cx="0" cy="24" r="8" class="badge-ok"/><text x="-26" y="54" class="text" style="font-size:12px">12:20 Contained</text></g>
+      <g transform="translate(800,0)"><circle cx="0" cy="24" r="8" class="badge-ok"/><text x="-26" y="54" class="text" style="font-size:12px">12:20 New</text></g>
     </g>
 
     <!-- Resource Usage -->
@@ -183,7 +183,7 @@
       <g transform="translate(24,168)">
         <g id="btn-generate-report" tabindex="0">
           <rect width="210" height="48" rx="12" class="btn" stroke="#22C55E"/>
-          <text x="16" y="30" class="btn-label" style="font-size:16px">Export Report</text>
+          <text x="16" y="30" class="btn-label" style="font-size:16px">Generate Report (PDF)</text>
         </g>
         <g id="btn-send-archive" tabindex="0" transform="translate(230,0)">
           <rect width="238" height="48" rx="12" class="btn" stroke="#8B5CF6"/>
@@ -203,7 +203,7 @@
       <g transform="translate(0,42)">
         <g id="btn-mark-closed" tabindex="0">
           <rect class="btn" width="180" height="56" stroke="#22C55E"/>
-          <text x="20" y="36" class="btn-label" style="font-size:16px">Finalize Incident</text>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Mark as Closed</text>
         </g>
         <g id="btn-notify-invest" tabindex="0" transform="translate(196,0)">
           <rect class="btn" width="210" height="56" stroke="#F59E0B"/>

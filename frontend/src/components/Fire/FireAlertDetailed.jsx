@@ -79,8 +79,10 @@ export default function FireAlertDetailed() {
         const res = await axios.get('/incidents')
         if (!mounted) return
         // include fire incidents even if incomplete; we'll surface missing fields in UI
-        const items = (res.data || [])
-          .filter(i => i.type === 'fire' && (i.status === 'new' || !i.status))
+      // include all fire incidents (don't filter by status here) so the UI shows
+      // alerts regardless of server-side status values (some producers use
+      // different status strings). We'll surface missing fields in the list.
+      const items = (res.data || []).filter(i => i.type === 'fire')
         // normalize some fields for UI convenience
         const norm = items.map(i => ({
           ...i,
@@ -143,10 +145,11 @@ export default function FireAlertDetailed() {
       try {
         const m = new mapboxgl.Map({ container: containerRef.current, style: 'mapbox://styles/mapbox/streets-v11', center: [23.6,46.77], zoom: 13 })
         mapRef.current = m
-        m.on('load', () => {
+          m.on('load', () => {
           if (!m.getSource('hydrants')) {
             m.addSource('hydrants', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
-            m.addLayer({ id: 'hydrant-point', type: 'circle', source: 'hydrants', paint: { 'circle-radius': 8, 'circle-color': '#06b6d4' } })
+            // larger, more visible hydrant marker with white stroke for contrast
+            m.addLayer({ id: 'hydrant-point', type: 'circle', source: 'hydrants', paint: { 'circle-radius': 12, 'circle-color': '#06b6d4', 'circle-stroke-width': 2, 'circle-stroke-color': '#ffffff' } })
           }
           if (!m.getSource('hydrant-lines')) {
             m.addSource('hydrant-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
@@ -171,16 +174,36 @@ export default function FireAlertDetailed() {
         .sort((a,b) => a.d - b.d).slice(0,3)
 
       try {
-        if (map && map.getSource) {
-          const hydrFeatures = hx.map(h => ({ type: 'Feature', properties: { id: h.id, dist: Math.round(h.d) }, geometry: { type: 'Point', coordinates: [h.lon, h.lat] } }))
-          map.getSource('hydrants').setData({ type: 'FeatureCollection', features: hydrFeatures })
-          map.getSource('incident-point').setData({ type: 'Feature', geometry: { type: 'Point', coordinates: [incident.lon || incident.location?.lon || 0, incident.lat || incident.location?.lat || 0] } })
-          const lineFeatures = hx.map(h => ({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[h.lon, h.lat], [incident.lon || incident.location?.lon || 0, incident.lat || incident.location?.lat || 0]] } }))
-          map.getSource('hydrant-lines').setData({ type: 'FeatureCollection', features: lineFeatures })
-          // fit to bounds of hydrants + incident
-          const coords = [].concat(...lineFeatures.map(f => f.geometry.coordinates))
-          const lats = coords.map(c => c[1]); const lons = coords.map(c => c[0])
-          map.fitBounds([[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]], { padding: 40 })
+        if (map) {
+          const setDataOnMap = () => {
+            try {
+              const hydrFeatures = hx.map(h => ({ type: 'Feature', properties: { id: h.id, dist: Math.round(h.d) }, geometry: { type: 'Point', coordinates: [h.lon, h.lat] } }))
+              if (map.getSource('hydrants')) map.getSource('hydrants').setData({ type: 'FeatureCollection', features: hydrFeatures })
+              if (map.getSource('incident-point')) map.getSource('incident-point').setData({ type: 'Feature', geometry: { type: 'Point', coordinates: [incident.lon || incident.location?.lon || 0, incident.lat || incident.location?.lat || 0] } })
+              const lineFeatures = hx.map(h => ({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[h.lon, h.lat], [incident.lon || incident.location?.lon || 0, incident.lat || incident.location?.lat || 0]] } }))
+              if (map.getSource('hydrant-lines')) map.getSource('hydrant-lines').setData({ type: 'FeatureCollection', features: lineFeatures })
+              // fit to bounds of hydrants + incident (guard against degenerate bounds)
+              const coords = [].concat(...lineFeatures.map(f => f.geometry.coordinates))
+              const lats = coords.map(c => c[1]); const lons = coords.map(c => c[0])
+              if (lats.length && lons.length) {
+                const minLon = Math.min(...lons); const minLat = Math.min(...lats)
+                const maxLon = Math.max(...lons); const maxLat = Math.max(...lats)
+                if (!(minLon === maxLon && minLat === maxLat)) {
+                  map.fitBounds([[minLon, minLat], [maxLon, maxLat]], { padding: 40 })
+                } else {
+                  map.setCenter([incident.lon || incident.location?.lon || 0, incident.lat || incident.location?.lat || 0])
+                  map.setZoom(14)
+                }
+              }
+            } catch (e) { console.warn('MiniHydrantMap set data failed', e) }
+          }
+
+          // If the map style isn't loaded yet, wait for it; otherwise set data immediately
+          if (!map.isStyleLoaded || !map.isStyleLoaded()) {
+            map.once('load', setDataOnMap)
+          } else {
+            setDataOnMap()
+          }
         }
       } catch (e) { console.warn('MiniHydrantMap set data failed', e) }
 
@@ -199,12 +222,16 @@ export default function FireAlertDetailed() {
               const geom = data.routes[0].geometry
               // add as a special layer to highlight street route
               try {
-                if (!map.getSource('hydrant-street')) {
-                  map.addSource('hydrant-street', { type: 'geojson', data: geom })
-                  map.addLayer({ id: 'hydrant-street-line', type: 'line', source: 'hydrant-street', paint: { 'line-color': '#06b6d4', 'line-width': 4 } })
-                } else {
-                  map.getSource('hydrant-street').setData(geom)
+                const setStreet = () => {
+                  if (!map.getSource('hydrant-street')) {
+                    map.addSource('hydrant-street', { type: 'geojson', data: geom })
+                    map.addLayer({ id: 'hydrant-street-line', type: 'line', source: 'hydrant-street', paint: { 'line-color': '#06b6d4', 'line-width': 4 } })
+                  } else {
+                    map.getSource('hydrant-street').setData(geom)
+                  }
                 }
+                if (!map.isStyleLoaded || !map.isStyleLoaded()) map.once('load', setStreet)
+                else setStreet()
               } catch (e) { console.warn('Could not set hydrant street route', e) }
             }
           } catch (err) { console.warn('Hydrant directions failed', err) }

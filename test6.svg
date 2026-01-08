@@ -1,0 +1,176 @@
+<svg id="Case-Close-Report" width="1440" height="900" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1226"/>
+      <stop offset="100%" stop-color="#1B0F3B"/>
+    </linearGradient>
+    <radialGradient id="glowCyan" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22D3EE" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowPurple" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      @font-face { font-family: 'Montserrat'; src: local('Montserrat'); }
+      .ui { font-family:'Montserrat', Arial, sans-serif; }
+      .title { fill:#E5E7EB; font-weight:700; }
+      .text { fill:#A7B0C0; }
+      .chip { fill:#0F172A; stroke:#334155; stroke-width:1.2; }
+      .panel { fill:rgba(10,17,37,.75); stroke:#3B82F6; stroke-opacity:.35; }
+      .divider { stroke:#273244; stroke-width:1; opacity:.6; }
+      .btn { rx:14; fill:#0B1327; stroke-width:1.6; }
+      .btn-label { fill:#E6F3FF; font-weight:600; }
+      .kpi { fill:rgba(12,18,39,.85); stroke:#26324A; }
+    </style>
+  </defs>
+
+  <rect width="1440" height="900" fill="url(#bgDark)"/>
+  <circle cx="340" cy="120" r="220" fill="url(#glowCyan)" opacity=".35"/>
+  <circle cx="1120" cy="760" r="300" fill="url(#glowPurple)" opacity=".40"/>
+
+  <g class="ui">
+    <rect x="24" y="24" width="1392" height="64" rx="16" class="chip"/>
+    <text x="48" y="66" class="title" style="font-size:22px">Case Closure — Report & Disposition</text>
+    <g transform="translate(1180,34)">
+      <rect width="206" height="40" rx="12" class="chip"/>
+      <text x="16" y="26" class="text" style="font-size:14px">Case ID: <tspan fill="#E5E7EB">#inc_1767862369_9</tspan></text>
+    </g>
+  </g>
+
+  <g class="ui" transform="translate(24,104)">
+    <rect width="880" height="190" rx="22" class="panel"/>
+    <text x="24" y="42" class="title" style="font-size:20px">Summary</text>
+    <line x1="20" y1="52" x2="860" y2="52" class="divider"/>
+    <text x="24" y="84" class="text" style="font-size:16px">Patient: <tspan fill="#E5E7EB">Oana Dumitru, 40</tspan> • Incident: <tspan fill="#E5E7EB">medical</tspan></text>
+    <text x="24" y="112" class="text" style="font-size:16px">Location: <tspan fill="#E5E7EB">Str. Observator 7, Cluj-Napoca</tspan> • First response: <tspan fill="#E5E7EB">N/A</tspan></text>
+    <text x="24" y="140" class="text" style="font-size:16px">On-scene time: <tspan fill="#E5E7EB">11:49</tspan> • ROSC: <tspan fill="#E5E7EB">Yes @ 11:56</tspan> • Transport: <tspan fill="#E5E7EB">11:59 → 12:06</tspan></text>
+    <text x="24" y="168" class="text" style="font-size:16px">Outcome on arrival: <tspan fill="#E5E7EB">Spontaneous circulation, stable airway</tspan></text>
+
+    <g transform="translate(0,206)">
+      <rect width="880" height="242" rx="22" class="panel"/>
+      <text x="24" y="42" class="title" style="font-size:20px">Treatment Log</text>
+      <line x1="20" y1="52" x2="860" y2="52" class="divider"/>
+      <g transform="translate(24,68)">
+        <text class="text" x="0" y="0" style="font-size:12px;opacity:.7">TIME</text>
+        <text class="text" x="80" y="0" style="font-size:12px;opacity:.7">ACTION</text>
+        <text class="text" x="360" y="0" style="font-size:12px;opacity:.7">DETAILS</text>
+        <line x1="0" y1="8" x2="832" y2="8" class="divider"/>
+      </g>
+      <g transform="translate(24,86)">
+        <text x="0" y="24" class="title" style="font-size:14px">11:48</text>
+        <text x="80" y="24" class="text" style="font-size:14px">CPR Started</text>
+        <text x="360" y="24" class="text" style="font-size:14px">Bystander CPR, continuous compressions</text>
+        <text x="0" y="56" class="title" style="font-size:14px">11:50</text>
+        <text x="80" y="56" class="text" style="font-size:14px">Defibrillation</text>
+        <text x="360" y="56" class="text" style="font-size:14px">Shock #1 — 200J biphasic</text>
+        <text x="0" y="88" class="title" style="font-size:14px">11:53</text>
+        <text x="80" y="88" class="text" style="font-size:14px">Medication</text>
+        <text x="360" y="88" class="text" style="font-size:14px">Adrenaline 1mg IV</text>
+        <text x="0" y="120" class="title" style="font-size:14px">11:56</text>
+        <text x="80" y="120" class="text" style="font-size:14px">ROSC Achieved</text>
+        <text x="360" y="120" class="text" style="font-size:14px">Pulse present, sinus rhythm</text>
+        <text x="0" y="152" class="title" style="font-size:14px">12:02</text>
+        <text x="80" y="152" class="text" style="font-size:14px">Airway</text>
+        <text x="360" y="152" class="text" style="font-size:14px">OPA + Oxygen 10 L/min</text>
+      </g>
+    </g>
+
+    <g transform="translate(0,456)">
+      <rect width="880" height="320" rx="22" class="panel"/>
+      <text x="24" y="42" class="title" style="font-size:20px">Future Notes & Recommendations</text>
+      <line x1="20" y1="52" x2="860" y2="52" class="divider"/>
+      <g transform="translate(24,70)">
+        <rect width="832" height="90" rx="12" class="kpi"/>
+        <text x="16" y="30" class="text" style="font-size:14px">Post-ROSC care</text>
+        <text x="16" y="58" class="title" style="font-size:16px">Targeted temperature management (TTM) if indicated • Continuous ECG monitoring • Cardiology consult</text>
+      </g>
+      <g transform="translate(24,170)">
+        <rect width="832" height="90" rx="12" class="kpi"/>
+        <text x="16" y="30" class="text" style="font-size:14px">Medication plan</text>
+        <text x="16" y="58" class="title" style="font-size:16px">Consider anti-arrhythmic per protocol • Labs: troponin, ABG • Chest X-ray</text>
+      </g>
+      <g transform="translate(24,270)">
+        <rect width="832" height="40" rx="10" class="kpi"/>
+        <text x="16" y="26" class="text" style="font-size:14px">Add note…</text>
+      </g>
+    </g>
+  </g>
+
+  <g class="ui" transform="translate(924,104)">
+    <rect width="492" height="290" rx="22" class="panel"/>
+    <text x="24" y="42" class="title" style="font-size:20px">Incident Timeline</text>
+    <line x1="20" y1="52" x2="468" y2="52" class="divider"/>
+    <g transform="translate(52,70)">
+      <line x1="0" y1="0" x2="0" y2="200" stroke="#22324D" stroke-width="2"/>
+      <g transform="translate(0,0)">
+        <circle r="6" fill="#22D3EE"/><text x="16" y="6" class="text" style="font-size:14px">2026-01-08T08:52:49.406466 — Alert received</text>
+      </g>
+      <g transform="translate(0,52)">
+        <circle r="6" fill="#22D3EE"/><text x="16" y="6" class="text" style="font-size:14px">11:44 — Unit N/A dispatched</text>
+      </g>
+      <g transform="translate(0,104)">
+        <circle r="6" fill="#8B5CF6"/><text x="16" y="6" class="text" style="font-size:14px">11:49 — On scene</text>
+      </g>
+      <g transform="translate(0,156)">
+        <circle r="6" fill="#22D3EE"/><text x="16" y="6" class="text" style="font-size:14px">2026-01-08T10:04:37.150610 — Closed</text>
+      </g>
+      <g transform="translate(0,208)">
+        <circle r="6" fill="#22D3EE"/><text x="16" y="6" class="text" style="font-size:14px">12:06 — Arrived at ER</text>
+      </g>
+    </g>
+
+    <g transform="translate(0,306)">
+      <rect width="492" height="210" rx="22" class="panel"/>
+      <text x="24" y="42" class="title" style="font-size:20px">Disposition</text>
+      <line x1="20" y1="52" x2="468" y2="52" class="divider"/>
+      <g transform="translate(24,70)">
+        <rect width="444" height="50" rx="12" class="kpi"/>
+        <circle cx="20" cy="25" r="10" fill="none" stroke="#22D3EE" stroke-width="2"/>
+        <circle cx="20" cy="25" r="5" fill="#22D3EE"/>
+        <text x="44" y="32" class="title" style="font-size:16px">Admit to Cardiology (ICU)</text>
+        <text x="320" y="32" class="text" style="font-size:12px">Recommended</text>
+      </g>
+      <g transform="translate(24,130)">
+        <rect width="444" height="50" rx="12" class="kpi"/>
+        <circle cx="20" cy="25" r="10" fill="none" stroke="#334155" stroke-width="2"/>
+        <text x="44" y="32" class="title" style="font-size:16px">Discharge with follow-up</text>
+        <text x="320" y="32" class="text" style="font-size:12px">Not advised</text>
+      </g>
+      <g transform="translate(24,188)">
+        <g id="btn-confirm" tabindex="0">
+          <rect class="btn" width="160" height="44" stroke="#22D3EE"/>
+          <text x="20" y="28" class="btn-label" style="font-size:16px">Confirm</text>
+        </g>
+        <g id="btn-cancel" tabindex="0" transform="translate(176,0)">
+          <rect class="btn" width="140" height="44" stroke="#334155"/>
+          <text x="20" y="28" class="text" style="font-size:16px">Cancel</text>
+        </g>
+      </g>
+    </g>
+
+    <g transform="translate(0,526)">
+      <rect width="492" height="250" rx="22" class="panel"/>
+      <text x="24" y="42" class="title" style="font-size:20px">Export & Handover</text>
+      <line x1="20" y1="52" x2="468" y2="52" class="divider"/>
+      <g transform="translate(24,72)">
+        <g id="btn-export" tabindex="0">
+          <rect width="210" height="56" rx="12" class="btn" stroke="#22D3EE"/>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Export PDF</text>
+        </g>
+      </g>
+      <g transform="translate(254,72)">
+        <g id="btn-send" tabindex="0">
+          <rect width="214" height="56" rx="12" class="btn" stroke="#8B5CF6"/>
+          <text x="20" y="36" class="btn-label" style="font-size:16px">Send to EHR</text>
+        </g>
+      </g>
+      <g transform="translate(24,140)">
+        <rect width="444" height="64" rx="12" class="kpi"/>
+        <text x="16" y="28" class="text" style="font-size:14px">Billing Reference</text>
+        <text x="16" y="50" class="title" style="font-size:16px">ER-inc_1767862369_9</text>
+      </g>
+    </g>
+  </g>
+</svg>

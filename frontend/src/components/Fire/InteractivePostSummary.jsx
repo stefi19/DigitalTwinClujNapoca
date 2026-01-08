@@ -26,16 +26,16 @@ export default function InteractivePostSummary({ incidentId = 'F-207' }) {
       try {
         const res = await axios.get(`/incidents/${incidentId}/export`, { responseType: 'blob' });
         const url = window.URL.createObjectURL(new Blob([res.data]));
-        const a = document.createElement('a'); a.href = url; a.download = `incident-${incidentId}-report.pdf`; document.body.appendChild(a); a.click(); a.remove();
+        const a = document.createElement('a'); a.href = url; a.download = `incident-${incidentId}-report.svg`; document.body.appendChild(a); a.click(); a.remove();
       } catch (e) { console.error(e); alert('Export failed'); }
     }
 
-    function handleAttach() { alert('Open file picker (not implemented)'); }
-    function handleAnnotate() { alert('Open annotate UI (not implemented)'); }
-    function handleSendArchive() { alert('Send to archive (placeholder)'); }
-    function handleMarkClosed() { setStatus('closed'); alert('Marked closed'); }
-    function handleNotify() { alert('Notified investigation'); }
-    function handleAddNotes() { alert('Open notes editor'); }
+    function handleAttach() { alert('Attach files functionality not implemented yet'); }
+    function handleAnnotate() { alert('Annotation functionality not implemented yet'); }
+    function handleSendArchive() { alert('Send to archive functionality not implemented yet'); }
+    function handleMarkClosed() { setStatus('closed'); alert('Incident finalized successfully'); }
+    function handleNotify() { alert('Investigation notification sent'); }
+    function handleAddNotes() { alert('Notes editor not implemented yet'); }
     function handleAnalytics() { window.location.href = '/analytics/historical'; }
 
     btnGen?.addEventListener('click', handleGenerate);

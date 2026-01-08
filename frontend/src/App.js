@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import axios from 'axios';
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { Pacient } from './components/Pacient';
 import DoctorAssign from './components/DoctorAssign/DoctorAssignDynamic';
 import DoctorDetailed from './components/DoctorDetailed';
 import { DoctorClosure } from './components/DoctorClosure';
 import { FireAlert } from './components/Fire/Alert';
 import { FireDispatch } from './components/Fire/Dispatch';
-import { FirePost } from './components/Fire/Post';
+import FireClosure from './components/Fire/FireClosure';
 import AdminIncidents from './components/CityAdministrator/AdminIncidents';
+import Dashboard from './components/Dashboard/Dashboard';
+import './styles/theme.css';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN || '';
 
@@ -25,55 +27,48 @@ function App() {
   const [testSeverity, setTestSeverity] = useState(3);
 
   useEffect(() => {
-    // Only initialize Mapbox when the '#map' container exists on the page.
-    // This avoids runtime errors when rendering non-map routes (eg. /pacient).
-    const container = document.getElementById('map');
-    if (!container) return;
-
-    const m = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [23.6, 46.77],
-      zoom: 12
-    });
-    setMap(m);
-    return () => {
-      try {
-        m.remove();
-      } catch (err) {
-        console.warn('Error removing map', err);
-      }
-      // clear map state so other effects don't try to use a removed map
-      setMap(null);
-    };
+    // App-level map initialization removed. Individual pages/components
+    // (like Dashboard) manage their own Mapbox instances in their components.
+    return;
   }, []);
 
   useEffect(() => {
-    // Use Server-Sent Events for live updates
-    const es = new EventSource('/stream/incidents');
-    es.onmessage = (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        // ambulance events use resource:'ambulance'
-        if (data && data.resource === 'ambulance') {
-          setAmbulances(prev => {
-            const idx = prev.findIndex(a => a.ambulance_id === data.ambulance_id);
-            if (idx >= 0) {
-              const copy = [...prev]; copy[idx] = { ...copy[idx], ...data }; return copy;
+    // Use Server-Sent Events for live updates. Wrap in try/catch so failures
+    // (eg. network errors or missing EventSource implementation) don't break the app.
+    let es = null;
+    try {
+      if (typeof window !== 'undefined' && typeof window.EventSource !== 'undefined') {
+        es = new EventSource('/stream/incidents');
+        es.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            // ambulance events use resource:'ambulance'
+            if (data && data.resource === 'ambulance') {
+              setAmbulances(prev => {
+                const idx = prev.findIndex(a => a.ambulance_id === data.ambulance_id);
+                if (idx >= 0) {
+                  const copy = [...prev]; copy[idx] = { ...copy[idx], ...data }; return copy;
+                }
+                return [data, ...prev].slice(0, 200);
+              });
+            } else {
+              setIncidents(prev => [data, ...prev].slice(0, 200));
             }
-            return [data, ...prev].slice(0, 200);
-          });
-        } else {
-          setIncidents(prev => [data, ...prev].slice(0, 200));
-        }
-      } catch (err) {
-        console.warn('Failed to parse SSE message', err);
+          } catch (err) {
+            console.warn('Failed to parse SSE message', err);
+          }
+        };
+        es.onerror = (err) => {
+          console.warn('SSE error', err);
+          try { es.close(); } catch(e){}
+        };
+      } else {
+        console.warn('EventSource not available in this environment; skipping SSE setup');
       }
-    };
-    es.onerror = (err) => {
-      console.warn('SSE error', err);
-      es.close();
-    };
+    } catch (err) {
+      console.warn('Failed to initialize SSE (non-fatal)', err);
+      es = null;
+    }
     // fallback initial load
     async function load() {
       try {
@@ -91,7 +86,21 @@ function App() {
       }
     }
     load();
-    return () => es.close();
+    return () => {
+      try { if (es && typeof es.close === 'function') es.close(); } catch (e) {}
+    };
+  }, []);
+
+  // Global error handler to assist debugging (prints stack traces to console)
+  useEffect(() => {
+    const onErr = (event) => {
+      try {
+        console.error('Global error captured:', event);
+      } catch (e) {}
+    };
+    window.addEventListener('error', onErr);
+    window.addEventListener('unhandledrejection', onErr);
+    return () => { window.removeEventListener('error', onErr); window.removeEventListener('unhandledrejection', onErr); };
   }, []);
 
   useEffect(() => {
@@ -328,47 +337,49 @@ function App() {
 
   return (
     <Router>
-      <div style={{height: '100vh', display: 'flex'}}>
+      <div className="app-container" style={{height: '100vh', display: 'flex'}}>
         <main style={{height: '100%', flex: 1, position: 'relative'}}>
           <Routes>
-            <Route path="/" element={<div id="map" style={{height: '100%', width: '100%'}} />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/pacient" element={<Pacient />} />
             <Route path="/doctor/assign" element={<DoctorAssign />} />
             <Route path="/doctor/detailed" element={<DoctorDetailed />} />
             <Route path="/doctor/closure" element={<DoctorClosure />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/fire/alert" element={<FireAlert />} />
             <Route path="/fire/dispatch" element={<FireDispatch />} />
-            <Route path="/fire/post" element={<FirePost />} />
+            <Route path="/fire/post" element={<FireClosure />} />
             <Route path="/admin/incidents" element={<AdminIncidents />} />
           </Routes>
         </main>
 
-        <aside style={{width: 360, maxWidth: '36%', padding: 12, background: 'rgba(255,255,255,0.95)', overflow: 'auto'}}>
+        <aside className="panel panel-aside" style={{width: 360, maxWidth: '36%', padding: 12, overflow: 'auto'}}>
           <div style={{display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap'}}>
-            <NavLink to="/" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#111827' : '#eef2ff', color: isActive? '#fff' : '#111', textDecoration: 'none'})} end>Dashboard</NavLink>
-            <NavLink to="/pacient" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#111827' : '#eef2ff', color: isActive? '#fff' : '#111', textDecoration: 'none'})}>Pacient</NavLink>
-            <NavLink to="/doctor/assign" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#111827' : '#eef2ff', color: isActive? '#fff' : '#111', textDecoration: 'none'})}>Doctor Assign</NavLink>
-            <NavLink to="/doctor/detailed" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#111827' : '#eef2ff', color: isActive? '#fff' : '#111', textDecoration: 'none'})}>Doctor Detailed</NavLink>
-            <NavLink to="/doctor/closure" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#111827' : '#eef2ff', color: isActive? '#fff' : '#111', textDecoration: 'none'})}>Doctor Closure</NavLink>
-            <NavLink to="/fire/alert" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#111827' : '#eef2ff', color: isActive? '#fff' : '#111', textDecoration: 'none'})}>Fire Alert</NavLink>
-            <NavLink to="/fire/dispatch" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#111827' : '#eef2ff', color: isActive? '#fff' : '#111', textDecoration: 'none'})}>Fire Dispatch</NavLink>
-            <NavLink to="/fire/post" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#111827' : '#eef2ff', color: isActive? '#fff' : '#111', textDecoration: 'none'})}>Fire Post</NavLink>
-            <NavLink to="/admin/incidents" style={({isActive}) => ({padding: '6px 8px', background: isActive? '#EF4444' : '#fee2e2', color: isActive? '#fff' : '#991b1b', textDecoration: 'none', fontWeight: 600})}>🚨 Admin Incidents</NavLink>
+            
+            <NavLink to="/pacient" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Pacient</NavLink>
+            <NavLink to="/doctor/assign" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Doctor Assign</NavLink>
+            <NavLink to="/doctor/detailed" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Doctor Detailed</NavLink>
+            <NavLink to="/doctor/closure" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Doctor Closure</NavLink>
+            <NavLink to="/dashboard" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Dashboard</NavLink>
+            <NavLink to="/fire/alert" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Fire Alert</NavLink>
+            <NavLink to="/fire/dispatch" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Fire Dispatch</NavLink>
+            <NavLink to="/fire/post" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Fire Closure</NavLink>
+            <NavLink to="/admin/incidents" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'} style={{fontWeight:600}}>🚨 Admin Incidents</NavLink>
           </div>
 
           <div style={{marginBottom: 12}}>
-            <h3>Latest incidents</h3>
+            <h3 style={{color: 'var(--text)'}}>Latest incidents</h3>
             <div style={{marginBottom: 12}}>
-              <div style={{fontSize: 13, color: '#444'}}>To create new incidents use the Admin panel: <a href="/admin/incidents">Admin Incidents</a></div>
+              <div style={{fontSize: 13, color: 'var(--muted)'}}>To create new incidents use the Admin panel: <a href="/admin/incidents">Admin Incidents</a></div>
             </div>
           </div>
 
           <ul style={{listStyle: 'none', padding: 0}}>
             {incidents.map((inc, idx) => (
-              <li key={inc.id + '_' + idx} style={{padding: '6px 0', borderBottom: '1px solid #eee'}}>
-                <div><strong>{inc.type}</strong> — severity {inc.severity}</div>
-                <div style={{fontSize: 12, color: '#666'}}>{inc.received_at || ''}</div>
-                <div style={{fontSize: 12}}>{Number(inc.lat).toFixed(5)}, {Number(inc.lon).toFixed(5)}</div>
+              <li key={inc.id + '_' + idx} style={{padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)'}}>
+                <div style={{color: 'var(--text)'}}><strong>{inc.type}</strong> — severity {inc.severity}</div>
+                <div style={{fontSize: 12, color: 'var(--muted)'}}>{inc.received_at || ''}</div>
+                <div style={{fontSize: 12, color: 'var(--muted)'}}>{Number(inc.lat).toFixed(5)}, {Number(inc.lon).toFixed(5)}</div>
               </li>
             ))}
           </ul>

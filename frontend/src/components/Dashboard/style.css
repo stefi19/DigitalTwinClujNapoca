@@ -1,0 +1,53 @@
+.dashboard-root{ padding:16px; color:var(--text); font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; height: 100%; display: flex; flex-direction: column }
+.dashboard-header h2{ margin:0 0 4px 0 }
+.dashboard-header .muted{ color:var(--muted); margin-bottom:12px }
+.dashboard-cards{ display:flex; gap:12px; margin-bottom:12px }
+.card{ background:var(--panel-bg); border:1px solid rgba(255,255,255,0.03); padding:12px; border-radius:8px; min-width:160px }
+.card-title{ color:var(--muted); font-size:13px }
+.card-value{ font-weight:700; font-size:20px; margin-top:6px }
+.dashboard-map{
+	/* Combined map container styles: transparent panel look + positioning for
+	   Mapbox canvas stacking. Keep background transparent so map tiles are
+	   visible; use a subtle border and padding to match panel cards. */
+	background: rgba(255,0,0,0.04); /* TEMP DEBUG: light red so the map area is obvious */
+	border-radius: 8px;
+	overflow: hidden;
+	border: 2px dashed rgba(255,0,0,0.18); /* TEMP DEBUG: dashed red border */
+	padding: 8px;
+	position: relative;
+	z-index: 9999; /* ensures the map container sits above page pseudo-elements */
+	/* allow the map block to grow in the column layout */
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+.map-container{ width:100%; height:520px }
+.map-placeholder{ padding:24px; color:var(--muted); text-align:center }
+
+/* Reuse DoctorDetailed mini-route styles so the dashboard map uses a known-good
+	container with explicit height and overflow rules. */
+.mini-route-root{ position:relative; height:520px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.03) }
+.mini-route-map{ width:100%; height:100% }
+.mini-route-status{ position:absolute; left:10px; bottom:10px; background: rgba(0,0,0,0.5); color:#fff; padding:6px 8px; border-radius:6px; font-size:13px }
+.mini-route-empty{ color:var(--muted); padding:12px }
+
+/* Ensure the Mapbox canvas is above other page layers which may use gradients
+	or pseudo-elements. This prevents a dark background layer from visually
+	covering the interactive map. */
+/* Temporary debug styling: visible outline and faint background so we can see the
+	map container in the UI while debugging. Remove when issue is resolved. */
+.map-container{ position: relative; z-index: 10000; background: rgba(255,0,0,0.06); outline: 4px solid rgba(255,0,0,0.18); min-height: 160px; height: 100%; }
+/* Mapbox requires the canvas to be absolutely positioned so it fills the container. */
+.mapboxgl-canvas { position: absolute !important; top: 0 !important; left: 0 !important; z-index: 10001 !important; }
+
+/* debug aid: uncomment border for visual debugging
+.map-container { outline: 3px solid rgba(0,255,0,0.25); } */
+
+.dashboard-legend{ display:flex; gap:16px; margin-top:8px; align-items:center }
+.legend-item{ display:flex; gap:8px; align-items:center; color:var(--muted) }
+.dot{ width:12px; height:12px; border-radius:50%; display:inline-block }
+.dot.low{ background:rgba(59,130,246,0.6) }
+.dot.med{ background:rgba(250,204,21,0.8) }
+.dot.high{ background:rgba(239,68,68,0.9) }
+.loading{ color:var(--muted); margin-top:10px }
+@media (max-width: 900px){ .dashboard-cards{ flex-direction:column } .map-container{ height:360px } }

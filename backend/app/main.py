@@ -13,12 +13,14 @@ from typing import List, Optional
 from .consumer import start_mqtt_listener, incidents_store, flush_kafka
 from .db import SessionLocal
 from .models import Incident as IncidentModel, Ambulance as AmbulanceModel
+from .models import Closure as ClosureModel
 from .broadcast import broadcaster
 from .db import engine
 from .models import Base as ModelsBase
 from fastapi import Body
 import random
 import traceback
+from .utils import enrich_incident
 
 
 app = FastAPI(title="DERN - Backend")
@@ -37,6 +39,7 @@ class AssignRequest(BaseModel):
     start_lat: Optional[float]
     start_lon: Optional[float]
     speed_kmh: Optional[float] = 40.0
+    unit_type: Optional[str] = 'ambulance'
 
 
 def haversine_meters(lat1, lon1, lat2, lon2):
@@ -61,17 +64,32 @@ async def simulate_ambulance(amb_id: str):
             return
 
         # loop until arrival; if route geojson is present follow its coordinates sequentially
-        tick_s = 2.0
+        # Use shorter ticks for snappier updates
+        tick_s = 1.0
         try:
             route_points = None
             if amb.route:
                 try:
                     route_obj = json.loads(amb.route)
                     # Mapbox geojson coordinates are [lon, lat]
-                    coords = route_obj.get('coordinates') if isinstance(route_obj, dict) else None
+                    coords = None
+                    if isinstance(route_obj, dict):
+                        # common GeoJSON shapes: either a LineString with 'coordinates'
+                        # or a FeatureCollection/Feature with geometry.coordinates
+                        if 'coordinates' in route_obj:
+                            coords = route_obj.get('coordinates')
+                        else:
+                            # try to handle Feature / FeatureCollection
+                            features = route_obj.get('features')
+                            if features and isinstance(features, list):
+                                geom = features[0].get('geometry') if isinstance(features[0], dict) else None
+                                if geom and 'coordinates' in geom:
+                                    coords = geom.get('coordinates')
+                    # convert to [(lat, lon), ...] if coords is a list of [lon, lat]
                     if coords:
-                        # convert to [(lat, lon), ...]
                         route_points = [(c[1], c[0]) for c in coords]
+                    else:
+                        route_points = None
                 except Exception:
                     route_points = None
 
@@ -87,7 +105,7 @@ async def simulate_ambulance(amb_id: str):
                         amb.lon = next_lon
                         idx += 1
                     else:
-                        speed_m_s = (amb.speed_kmh or 40.0) * 1000.0 / 3600.0
+                        speed_m_s = (amb.speed_kmh or 80.0) * 1000.0 / 3600.0
                         move_m = speed_m_s * tick_s
                         frac = min(1.0, move_m / max(1.0, dist_m))
                         amb.lat = amb.lat + (next_lat - amb.lat) * frac
@@ -101,7 +119,7 @@ async def simulate_ambulance(amb_id: str):
                         remaining += haversine_meters(curr_lat, curr_lon, p_lat, p_lon)
                         curr_lat, curr_lon = p_lat, p_lon
 
-                    speed_m_s = (amb.speed_kmh or 40.0) * 1000.0 / 3600.0
+                    speed_m_s = (amb.speed_kmh or 80.0) * 1000.0 / 3600.0
                     eta_seconds = remaining / max(0.1, speed_m_s)
                     amb.eta = datetime.utcnow() + timedelta(seconds=eta_seconds)
                     db.commit()
@@ -155,7 +173,7 @@ async def simulate_ambulance(amb_id: str):
 
                         break
 
-                    speed_m_s = (amb.speed_kmh or 40.0) * 1000.0 / 3600.0
+                    speed_m_s = (amb.speed_kmh or 80.0) * 1000.0 / 3600.0
                     move_m = speed_m_s * tick_s
                     frac = min(1.0, move_m / max(1.0, dist_m))
                     new_lat = amb.lat + (amb.target_lat - amb.lat) * frac
@@ -174,7 +192,6 @@ async def simulate_ambulance(amb_id: str):
                     await asyncio.sleep(tick_s)
         except Exception as e:
             print('simulate_ambulance loop error', e)
-
     except Exception as e:
         print('simulate_ambulance error', e)
     finally:
@@ -218,14 +235,14 @@ async def startup_event():
                 uid = f"AMB-{i:02d}"
                 lat = center_lat + ((i % 7) - 3) * 0.005
                 lon = center_lon + ((i % 11) - 5) * 0.005
-                amb = AmbulanceModel(id=f"amb_{uid}", unit_name=uid, status='idle', lat=lat, lon=lon, target_lat=None, target_lon=None, speed_kmh=40.0)
+                amb = AmbulanceModel(id=f"amb_{uid}", unit_name=uid, status='idle', lat=lat, lon=lon, target_lat=None, target_lon=None, speed_kmh=80.0)
                 db.add(amb)
                 created += 1
             for i in range(1, 51):
                 uid = f"FIRE-{i:02d}"
                 lat = center_lat + ((i % 5) - 2) * 0.007
                 lon = center_lon + ((i % 9) - 4) * 0.007
-                amb = AmbulanceModel(id=f"fire_{uid}", unit_name=uid, status='idle', lat=lat, lon=lon, target_lat=None, target_lon=None, speed_kmh=35.0)
+                amb = AmbulanceModel(id=f"fire_{uid}", unit_name=uid, status='idle', lat=lat, lon=lon, target_lat=None, target_lon=None, speed_kmh=60.0)
                 db.add(amb)
                 created += 1
             db.commit()
@@ -314,12 +331,11 @@ async def stream_incidents(request: Request):
 def debug_publish(payload: dict = Body(...)):
     """Publish a new incident to SSE subscribers and persist to database."""
     try:
-        # normalize and store the incident
+        # normalize and store the incident (enrich missing UI fields)
         item = dict(payload)
-        item.setdefault('status', 'new')
-        item.setdefault('received_at', datetime.utcnow().isoformat())
+        item = enrich_incident(item)
         item.setdefault('severity', 1)
-        
+
         # Parse received_at for DB
         received_at = datetime.fromisoformat(item['received_at']) if isinstance(item.get('received_at'), str) else datetime.utcnow()
 
@@ -334,6 +350,13 @@ def debug_publish(payload: dict = Body(...)):
                 severity=int(item.get('severity', 1)),
                 status=item.get('status', 'new'),
                 notes=item.get('notes'),
+                patient_name=item.get('patient_name'),
+                patient_age=item.get('patient_age'),
+                patient_contact=item.get('patient_contact'),
+                address=item.get('address'),
+                contact=item.get('contact'),
+                sensor_id=item.get('sensor_id'),
+                sensor_type=item.get('sensor_type'),
                 received_at=received_at,
                 updated_at=datetime.utcnow()
             )
@@ -421,7 +444,8 @@ def assign_incident(incident_id: str, payload: AssignRequest):
         # use provided start coords, fall back to a small offset from incident to simulate distance
         start_lat = payload.start_lat if payload.start_lat is not None else (inc.lat + 0.008)
         start_lon = payload.start_lon if payload.start_lon is not None else (inc.lon + 0.008)
-        speed_kmh = payload.speed_kmh or 40.0
+        # prefer provided speed, otherwise use higher default for snappier movement
+        speed_kmh = payload.speed_kmh or 80.0
         unit_name = payload.unit_name or f"Unit {amb_id[:6]}"
 
         # Try to compute route and ETA using Mapbox Directions API if token is present
@@ -532,3 +556,494 @@ def resolve_incident(incident_id: str):
     if result:
         return JSONResponse(result)
     return JSONResponse({'ok': False, 'detail': 'incident not found'}, status_code=404)
+
+
+@app.get('/cases/closures')
+def get_closed_cases():
+    """Return incidents that are considered closed/terminated for doctor reporting."""
+    try:
+        db = SessionLocal()
+        # treat resolved/closed/confirmed as closed cases
+        rows = db.query(IncidentModel).filter(IncidentModel.status.in_(['resolved', 'closed', 'confirmed'])).order_by(IncidentModel.updated_at.desc()).all()
+        result = [r.to_dict() for r in rows]
+        db.close()
+        return result
+    except Exception as e:
+        print('Failed to fetch closed cases', e)
+        traceback.print_exc()
+        return []
+
+
+@app.post('/cases/confirm')
+def confirm_case(payload: dict = Body(...)):
+    """Mark a case as confirmed/closed. Expects JSON: { id: <case id> }"""
+    case_id = payload.get('id')
+    if not case_id:
+        return JSONResponse({'ok': False, 'detail': 'missing id'}, status_code=400)
+    res = update_incident_status(case_id, 'closed')
+    if res:
+        return JSONResponse({'ok': True, 'case': res.get('incident')})
+    return JSONResponse({'ok': False, 'detail': 'case not found'}, status_code=404)
+
+
+@app.get('/cases/{case_id}/export')
+def export_case_report(case_id: str):
+    """Generate a simple filled SVG report for a closed case and return it as a downloadable file.
+
+    This implementation performs text substitutions on the SVG template located in the frontend assets
+    and fills in a few placeholders with incident data. It's a lightweight demo export (SVG)."""
+    try:
+        db = SessionLocal()
+        inc = db.query(IncidentModel).filter(IncidentModel.id == case_id).order_by(IncidentModel.received_at.desc()).first()
+        db.close()
+        if not inc:
+            return JSONResponse({'ok': False, 'detail': 'case not found'}, status_code=404)
+
+        # locate the SVG template in the backend templates directory
+        svg_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates', 'case-close-report.svg'))
+        if not os.path.exists(svg_path):
+            print('SVG template not found at', svg_path)
+            return JSONResponse({'ok': False, 'detail': 'report template missing on server'}, status_code=500)
+
+        with open(svg_path, 'r', encoding='utf-8') as f:
+            svg = f.read()
+
+        # Prepare replacements based on incident fields (best-effort)
+        patient = inc.patient_name or 'Unknown'
+        age = str(inc.patient_age) if inc.patient_age is not None else ''
+        incident_label = inc.type or (inc.notes or 'Incident')
+        address = inc.address or f"{inc.lat:.5f}, {inc.lon:.5f}"
+        assigned = getattr(inc, 'assigned_to', None) or inc.assigned_to if hasattr(inc, 'assigned_to') else ''
+        received = inc.received_at.isoformat() if getattr(inc, 'received_at', None) else ''
+        updated = inc.updated_at.isoformat() if getattr(inc, 'updated_at', None) else ''
+
+        # Basic string substitutions seen in the template
+        svg = svg.replace('#1024', f'#{inc.id}')
+        svg = svg.replace('Ioan Popescu, 64, M', f'{patient}, {age}')
+        svg = svg.replace('Cardiac Arrest (OHCA)', incident_label)
+        svg = svg.replace('Observatorului 15, Cluj-Napoca', address)
+        svg = svg.replace('A-12', assigned or 'N/A')
+        # replace a few times entries for timeline/notes
+        svg = svg.replace('11:42 — Alert received', f'{received} — Alert received')
+        svg = svg.replace('11:56 — ROSC', f'{updated} — Closed')
+        svg = svg.replace('ER-2025-11-A12-1024', f'ER-{inc.id}')
+
+        # return as SVG content with attachment headers so browser downloads it
+        headers = {
+            'Content-Disposition': f'attachment; filename="case-{inc.id}.svg"'
+        }
+        return StreamingResponse(iter([svg.encode('utf-8')]), media_type='image/svg+xml', headers=headers)
+
+    except Exception as e:
+        print('Failed to export case report', e)
+        traceback.print_exc()
+        return JSONResponse({'ok': False, 'error': str(e)}, status_code=500)
+
+
+@app.get('/incidents/{incident_id}/export')
+def export_incident_report(incident_id: str):
+    """Generate a filled SVG report for an incident and return it as a downloadable file."""
+    try:
+        db = SessionLocal()
+        inc = db.query(IncidentModel).filter(IncidentModel.id == incident_id).order_by(IncidentModel.received_at.desc()).first()
+        db.close()
+        if not inc:
+            return JSONResponse({'ok': False, 'detail': 'incident not found'}, status_code=404)
+
+        # locate the SVG template in the backend templates directory
+        svg_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates', 'fire-post-incident-summary.svg'))
+        if not os.path.exists(svg_path):
+            return JSONResponse({'ok': False, 'detail': 'report template missing on server'}, status_code=500)
+
+        with open(svg_path, 'r', encoding='utf-8') as f:
+            svg = f.read()
+
+        # Prepare replacements based on incident fields
+        incident_id_display = inc.id
+        status = inc.status.title() if inc.status else 'Unknown'
+        duration = '00:38:21'  # placeholder for now
+        sensor_info = f"Sensor {inc.sensor_id}" if inc.sensor_id else "Manual Report"
+        location = inc.address or f"{inc.lat:.5f}, {inc.lon:.5f}" if inc.lat and inc.lon else "Unknown Location"
+        severity = f"Severity {inc.severity}" if inc.severity else "Unknown Severity"
+        timestamp = inc.received_at.strftime('%Y-%m-%d %H:%M:%S') if inc.received_at else 'Unknown Time'
+
+        # Basic string substitutions
+        svg = svg.replace('#F-207', f'#{incident_id_display}')
+        svg = svg.replace('Contained', status)
+        svg = svg.replace('00:38:21', duration)
+        svg = svg.replace('Sensor F-207', sensor_info)
+        svg = svg.replace('Strada Observator 7, Cluj-Napoca', location)
+        svg = svg.replace('Severity 3', severity)
+        svg = svg.replace('2025-01-08 10:15:23', timestamp)
+
+        # return as SVG content with attachment headers
+        headers = {
+            'Content-Disposition': f'attachment; filename="incident-{incident_id}.svg"'
+        }
+        return StreamingResponse(iter([svg.encode('utf-8')]), media_type='image/svg+xml', headers=headers)
+
+    except Exception as e:
+        print('Failed to export incident report', e)
+        traceback.print_exc()
+        return JSONResponse({'ok': False, 'error': str(e)}, status_code=500)
+
+
+@app.get('/cases/{case_id}')
+def get_case(case_id: str):
+    """Return a single case/incident by id."""
+    try:
+        db = SessionLocal()
+        inc = db.query(IncidentModel).filter(IncidentModel.id == case_id).order_by(IncidentModel.received_at.desc()).first()
+        db.close()
+        if not inc:
+            return JSONResponse({'ok': False, 'detail': 'case not found'}, status_code=404)
+        return inc.to_dict()
+    except Exception as e:
+        print('Failed to fetch case', e)
+        traceback.print_exc()
+        return JSONResponse({'ok': False, 'error': str(e)}, status_code=500)
+
+
+@app.get('/closure_reports')
+def get_closure_reports():
+    """Return all closure reports joined with their incident data."""
+    try:
+        db = SessionLocal()
+        closures = db.query(ClosureModel).order_by(ClosureModel.created_at.desc()).all()
+        out = []
+        for c in closures:
+            # find the corresponding incident (latest by received_at)
+            inc = db.query(IncidentModel).filter(IncidentModel.id == c.incident_id).order_by(IncidentModel.received_at.desc()).first()
+            row = {'closure': c.to_dict(), 'incident': inc.to_dict() if inc else None}
+            out.append(row)
+        db.close()
+        return out
+    except Exception as e:
+        print('Failed to fetch closure reports', e)
+        traceback.print_exc()
+        return []
+
+
+@app.get('/ml/risk')
+def get_ml_risk(grid_km: float = Query(3.0, description="half-extent of grid around city center in km"), cell_m: int = Query(500, description="grid cell size in meters"), hours_window: int = Query(168, description="hours window to weigh recent history (default 7 days)")):
+    """Return a simple GeoJSON grid of risk scores computed from a hardcoded incident history.
+
+    This is a lightweight server-side aggregation demo. It uses a small set of hardcoded
+    historical incidents (latitude, longitude, timestamp) and aggregates them into a
+    square grid centered on the configured city center. Each grid cell contains a
+    normalized risk score (0..1) and raw counts. The frontend can consume this GeoJSON
+    to draw choropleths or colored overlays.
+    """
+    try:
+        # center and conversion helpers
+        center_lat = float(os.getenv('CITY_CENTER_LAT', 46.7712))
+        center_lon = float(os.getenv('CITY_CENTER_LON', 23.6236))
+        now = datetime.utcnow()
+
+        # Hardcoded historical incidents (example). In production replace with DB query / ML model.
+        history = [
+            {'lat': center_lat + 0.010, 'lon': center_lon + 0.006, 'ts': now - timedelta(hours=2)},
+            {'lat': center_lat + 0.009, 'lon': center_lon + 0.004, 'ts': now - timedelta(hours=5)},
+            {'lat': center_lat - 0.006, 'lon': center_lon - 0.003, 'ts': now - timedelta(days=1, hours=2)},
+            {'lat': center_lat + 0.003, 'lon': center_lon - 0.010, 'ts': now - timedelta(days=3)},
+            {'lat': center_lat - 0.012, 'lon': center_lon + 0.008, 'ts': now - timedelta(days=10)},
+            {'lat': center_lat + 0.015, 'lon': center_lon + 0.012, 'ts': now - timedelta(hours=20)},
+            {'lat': center_lat - 0.004, 'lon': center_lon + 0.002, 'ts': now - timedelta(hours=50)},
+            {'lat': center_lat + 0.001, 'lon': center_lon - 0.002, 'ts': now - timedelta(hours=100)},
+        ]
+
+        # compute meters->degrees approximations at center latitude
+        meters_per_deg_lat = 111111.0
+        meters_per_deg_lon = 111111.0 * math.cos(math.radians(center_lat))
+
+        # grid side in meters (full width = 2 * grid_km km)
+        half_side_m = grid_km * 1000.0
+        full_side_m = half_side_m * 2.0
+        cells_per_side = max(1, int(full_side_m / float(cell_m)))
+
+        # cell size in degrees
+        cell_deg_lat = (cell_m / meters_per_deg_lat)
+        cell_deg_lon = (cell_m / meters_per_deg_lon)
+
+        # compute grid origin (south-west corner)
+        origin_lat = center_lat - (cell_deg_lat * cells_per_side) / 2.0
+        origin_lon = center_lon - (cell_deg_lon * cells_per_side) / 2.0
+
+        # initialize counts
+        grid = [[{'count': 0, 'weight': 0.0} for _ in range(cells_per_side)] for _ in range(cells_per_side)]
+
+        # accumulate history into grid cells with a simple temporal weighting
+        for h in history:
+            lat = h['lat']
+            lon = h['lon']
+            ts = h.get('ts', now)
+            # compute indices
+            i = int((lat - origin_lat) / cell_deg_lat)
+            j = int((lon - origin_lon) / cell_deg_lon)
+            if 0 <= i < cells_per_side and 0 <= j < cells_per_side:
+                hours_old = max(0.0, (now - ts).total_seconds() / 3600.0)
+                # recency factor: points within hours_window contribute more (linear decay)
+                recency = max(0.0, (hours_window - hours_old) / hours_window)
+                weight = 1.0 + recency  # base 1.0 plus recency boost in [0..1]
+                grid[i][j]['count'] += 1
+                grid[i][j]['weight'] += weight
+
+        # build GeoJSON FeatureCollection of cell polygons with computed score
+        features = []
+        max_score = 0.0
+        # temporary store raw scores to normalize later
+        raw_scores = [[0.0 for _ in range(cells_per_side)] for _ in range(cells_per_side)]
+        for i in range(cells_per_side):
+            for j in range(cells_per_side):
+                cell = grid[i][j]
+                raw = cell['weight']
+                raw_scores[i][j] = raw
+                if raw > max_score:
+                    max_score = raw
+
+        for i in range(cells_per_side):
+            for j in range(cells_per_side):
+                # polygon corners (lon, lat) order (GeoJSON)
+                lat0 = origin_lat + i * cell_deg_lat
+                lon0 = origin_lon + j * cell_deg_lon
+                lat1 = lat0 + cell_deg_lat
+                lon1 = lon0 + cell_deg_lon
+                poly = [
+                    [lon0, lat0],
+                    [lon1, lat0],
+                    [lon1, lat1],
+                    [lon0, lat1],
+                    [lon0, lat0]
+                ]
+                raw = raw_scores[i][j]
+                score = (raw / max_score) if max_score > 0 else 0.0
+                feat = {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Polygon',
+                        'coordinates': [poly]
+                    },
+                    'properties': {
+                        'count': grid[i][j]['count'],
+                        'raw_score': raw,
+                        'score': round(score, 4),
+                        'i': i,
+                        'j': j
+                    }
+                }
+                features.append(feat)
+
+        fc = {'type': 'FeatureCollection', 'features': features}
+        return JSONResponse(fc)
+
+    except Exception as e:
+        print('Failed to compute ML risk', e)
+        traceback.print_exc()
+        return JSONResponse({'ok': False, 'error': str(e)}, status_code=500)
+
+
+@app.get('/ml/risk/centroids')
+def get_ml_risk_centroids(grid_km: float = Query(3.0, description="half-extent of grid around city center in km"), cell_m: int = Query(500, description="grid cell size in meters"), hours_window: int = Query(168, description="hours window to weigh recent history (default 7 days)")):
+    """Return a lightweight GeoJSON FeatureCollection of POINT centroids for grid cells that have non-zero risk.
+
+    Useful for map layers that only need points instead of full polygons.
+    """
+    try:
+        # re-use same parameters and hardcoded history as /ml/risk for consistency
+        center_lat = float(os.getenv('CITY_CENTER_LAT', 46.7712))
+        center_lon = float(os.getenv('CITY_CENTER_LON', 23.6236))
+        now = datetime.utcnow()
+
+        history = [
+            {'lat': center_lat + 0.010, 'lon': center_lon + 0.006, 'ts': now - timedelta(hours=2)},
+            {'lat': center_lat + 0.009, 'lon': center_lon + 0.004, 'ts': now - timedelta(hours=5)},
+            {'lat': center_lat - 0.006, 'lon': center_lon - 0.003, 'ts': now - timedelta(days=1, hours=2)},
+            {'lat': center_lat + 0.003, 'lon': center_lon - 0.010, 'ts': now - timedelta(days=3)},
+            {'lat': center_lat - 0.012, 'lon': center_lon + 0.008, 'ts': now - timedelta(days=10)},
+            {'lat': center_lat + 0.015, 'lon': center_lon + 0.012, 'ts': now - timedelta(hours=20)},
+            {'lat': center_lat - 0.004, 'lon': center_lon + 0.002, 'ts': now - timedelta(hours=50)},
+            {'lat': center_lat + 0.001, 'lon': center_lon - 0.002, 'ts': now - timedelta(hours=100)},
+        ]
+
+        meters_per_deg_lat = 111111.0
+        meters_per_deg_lon = 111111.0 * math.cos(math.radians(center_lat))
+        half_side_m = grid_km * 1000.0
+        full_side_m = half_side_m * 2.0
+        cells_per_side = max(1, int(full_side_m / float(cell_m)))
+        cell_deg_lat = (cell_m / meters_per_deg_lat)
+        cell_deg_lon = (cell_m / meters_per_deg_lon)
+        origin_lat = center_lat - (cell_deg_lat * cells_per_side) / 2.0
+        origin_lon = center_lon - (cell_deg_lon * cells_per_side) / 2.0
+
+        # accumulate weights like /ml/risk
+        grid_weights = [[0.0 for _ in range(cells_per_side)] for _ in range(cells_per_side)]
+        grid_counts = [[0 for _ in range(cells_per_side)] for _ in range(cells_per_side)]
+        for h in history:
+            lat = h['lat']; lon = h['lon']; ts = h.get('ts', now)
+            i = int((lat - origin_lat) / cell_deg_lat)
+            j = int((lon - origin_lon) / cell_deg_lon)
+            if 0 <= i < cells_per_side and 0 <= j < cells_per_side:
+                hours_old = max(0.0, (now - ts).total_seconds() / 3600.0)
+                recency = max(0.0, (hours_window - hours_old) / hours_window)
+                weight = 1.0 + recency
+                grid_weights[i][j] += weight
+                grid_counts[i][j] += 1
+
+        # find max for normalization
+        max_raw = 0.0
+        for i in range(cells_per_side):
+            for j in range(cells_per_side):
+                if grid_weights[i][j] > max_raw:
+                    max_raw = grid_weights[i][j]
+
+        features = []
+        for i in range(cells_per_side):
+            for j in range(cells_per_side):
+                raw = grid_weights[i][j]
+                if raw <= 0.0:
+                    continue
+                # centroid of cell
+                lat0 = origin_lat + i * cell_deg_lat
+                lon0 = origin_lon + j * cell_deg_lon
+                center_lat_cell = lat0 + cell_deg_lat / 2.0
+                center_lon_cell = lon0 + cell_deg_lon / 2.0
+                score = (raw / max_raw) if max_raw > 0 else 0.0
+                feat = {
+                    'type': 'Feature',
+                    'geometry': {'type': 'Point', 'coordinates': [round(center_lon_cell, 6), round(center_lat_cell, 6)]},
+                    'properties': {
+                        'count': grid_counts[i][j],
+                        'raw_score': round(raw, 3),
+                        'score': round(score, 4),
+                        'i': i,
+                        'j': j
+                    }
+                }
+                features.append(feat)
+
+        return JSONResponse({'type': 'FeatureCollection', 'features': features})
+
+    except Exception as e:
+        print('Failed to compute centroids', e)
+        traceback.print_exc()
+        return JSONResponse({'ok': False, 'error': str(e)}, status_code=500)
+
+
+@app.get('/ml/risk/clusters')
+def get_ml_risk_clusters(grid_km: float = Query(3.0, description="half-extent of grid around city center in km"), cell_m: int = Query(500, description="grid cell size in meters"), hours_window: int = Query(168, description="hours window to weigh recent history (default 7 days)")):
+    """Return simple clusters by merging adjacent non-empty grid cells into cluster centroids.
+
+    This is a cheap server-side clustering suitable for map markers representing hotspots.
+    """
+    try:
+        # reuse same grid computation and history
+        center_lat = float(os.getenv('CITY_CENTER_LAT', 46.7712))
+        center_lon = float(os.getenv('CITY_CENTER_LON', 23.6236))
+        now = datetime.utcnow()
+
+        history = [
+            {'lat': center_lat + 0.010, 'lon': center_lon + 0.006, 'ts': now - timedelta(hours=2)},
+            {'lat': center_lat + 0.009, 'lon': center_lon + 0.004, 'ts': now - timedelta(hours=5)},
+            {'lat': center_lat - 0.006, 'lon': center_lon - 0.003, 'ts': now - timedelta(days=1, hours=2)},
+            {'lat': center_lat + 0.003, 'lon': center_lon - 0.010, 'ts': now - timedelta(days=3)},
+            {'lat': center_lat - 0.012, 'lon': center_lon + 0.008, 'ts': now - timedelta(days=10)},
+            {'lat': center_lat + 0.015, 'lon': center_lon + 0.012, 'ts': now - timedelta(hours=20)},
+            {'lat': center_lat - 0.004, 'lon': center_lon + 0.002, 'ts': now - timedelta(hours=50)},
+            {'lat': center_lat + 0.001, 'lon': center_lon - 0.002, 'ts': now - timedelta(hours=100)},
+        ]
+
+        meters_per_deg_lat = 111111.0
+        meters_per_deg_lon = 111111.0 * math.cos(math.radians(center_lat))
+        half_side_m = grid_km * 1000.0
+        full_side_m = half_side_m * 2.0
+        cells_per_side = max(1, int(full_side_m / float(cell_m)))
+        cell_deg_lat = (cell_m / meters_per_deg_lat)
+        cell_deg_lon = (cell_m / meters_per_deg_lon)
+        origin_lat = center_lat - (cell_deg_lat * cells_per_side) / 2.0
+        origin_lon = center_lon - (cell_deg_lon * cells_per_side) / 2.0
+
+        grid_weights = [[0.0 for _ in range(cells_per_side)] for _ in range(cells_per_side)]
+        grid_counts = [[0 for _ in range(cells_per_side)] for _ in range(cells_per_side)]
+        for h in history:
+            lat = h['lat']; lon = h['lon']; ts = h.get('ts', now)
+            i = int((lat - origin_lat) / cell_deg_lat)
+            j = int((lon - origin_lon) / cell_deg_lon)
+            if 0 <= i < cells_per_side and 0 <= j < cells_per_side:
+                hours_old = max(0.0, (now - ts).total_seconds() / 3600.0)
+                recency = max(0.0, (hours_window - hours_old) / hours_window)
+                weight = 1.0 + recency
+                grid_weights[i][j] += weight
+                grid_counts[i][j] += 1
+
+        # simple BFS clustering on 8-neighbors for cells with raw>0
+        visited = [[False for _ in range(cells_per_side)] for _ in range(cells_per_side)]
+        clusters = []
+        for i in range(cells_per_side):
+            for j in range(cells_per_side):
+                if visited[i][j] or grid_weights[i][j] <= 0.0:
+                    continue
+                # start a new cluster
+                queue = [(i, j)]
+                visited[i][j] = True
+                cells = []
+                while queue:
+                    ci, cj = queue.pop(0)
+                    cells.append((ci, cj))
+                    # explore neighbors
+                    for di in (-1, 0, 1):
+                        for dj in (-1, 0, 1):
+                            ni, nj = ci + di, cj + dj
+                            if ni < 0 or nj < 0 or ni >= cells_per_side or nj >= cells_per_side:
+                                continue
+                            if visited[ni][nj]:
+                                continue
+                            if grid_weights[ni][nj] <= 0.0:
+                                continue
+                            visited[ni][nj] = True
+                            queue.append((ni, nj))
+                # aggregate cluster
+                total_raw = 0.0
+                total_count = 0
+                weighted_lat = 0.0
+                weighted_lon = 0.0
+                for (ci, cj) in cells:
+                    raw = grid_weights[ci][cj]
+                    total_raw += raw
+                    total_count += grid_counts[ci][cj]
+                    lat0 = origin_lat + ci * cell_deg_lat
+                    lon0 = origin_lon + cj * cell_deg_lon
+                    center_lat_cell = lat0 + cell_deg_lat / 2.0
+                    center_lon_cell = lon0 + cell_deg_lon / 2.0
+                    weighted_lat += center_lat_cell * raw
+                    weighted_lon += center_lon_cell * raw
+                if total_raw > 0:
+                    centroid_lat = weighted_lat / total_raw
+                    centroid_lon = weighted_lon / total_raw
+                else:
+                    centroid_lat = origin_lat + (i * cell_deg_lat) + cell_deg_lat / 2.0
+                    centroid_lon = origin_lon + (j * cell_deg_lon) + cell_deg_lon / 2.0
+                clusters.append({'centroid': (centroid_lat, centroid_lon), 'total_raw': total_raw, 'total_count': total_count, 'cells': len(cells)})
+
+        # normalize cluster scores by max raw among clusters
+        max_cluster_raw = max([c['total_raw'] for c in clusters], default=0.0)
+        features = []
+        for c in clusters:
+            score = (c['total_raw'] / max_cluster_raw) if max_cluster_raw > 0 else 0.0
+            feat = {
+                'type': 'Feature',
+                'geometry': {'type': 'Point', 'coordinates': [round(c['centroid'][1], 6), round(c['centroid'][0], 6)]},
+                'properties': {
+                    'cluster_cells': c['cells'],
+                    'total_count': c['total_count'],
+                    'total_raw': round(c['total_raw'], 3),
+                    'score': round(score, 4)
+                }
+            }
+            features.append(feat)
+
+        return JSONResponse({'type': 'FeatureCollection', 'features': features})
+
+    except Exception as e:
+        print('Failed to compute clusters', e)
+        traceback.print_exc()
+        return JSONResponse({'ok': False, 'error': str(e)}, status_code=500)

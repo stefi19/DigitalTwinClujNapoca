@@ -78,8 +78,8 @@ export default function DoctorAssignDynamic() {
                     }
 
                     setPending(prev => {
-                        // Only care about medical incidents in this view
-                        if (inc.type !== 'medical') return prev.filter(p => p.id !== inc.id);
+                                        // Only care about medical incidents in this view
+                                        if (inc.type !== 'medical') return prev.filter(p => p.id !== inc.id);
                         // If an incident becomes accepted, add/update it in this list
                         if (inc.status === 'accepted') {
                             const idx = prev.findIndex(p => p.id === inc.id);
@@ -162,7 +162,7 @@ export default function DoctorAssignDynamic() {
     return (
         <div style={{padding: 12}}>
             <h2>Assign Doctor / Ambulance</h2>
-            <div style={{marginBottom: 12, color: '#94A3B8'}}>This view shows all pending incidents (status=new). It updates in real time.</div>
+                <div style={{marginBottom: 12, color: '#94A3B8'}}>This view shows all pending incidents (status=new). It updates in real time.</div>
 
             {loading ? <div>Loading pending incidents…</div> : (
                 <div style={{display: 'grid', gap: 8}}>

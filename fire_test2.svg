@@ -38,11 +38,11 @@
   <!-- Header -->
   <g class="ui" id="Header">
     <rect x="24" y="24" width="1392" height="64" rx="16" class="chip"/>
-    <text x="48" y="66" class="title" style="font-size:22px">Post-Incident Summary — Incident #F-207</text>
+    <text x="48" y="66" class="title" style="font-size:22px">Post-Incident Summary — Incident #inc_1767867380_512</text>
     <g transform="translate(980,34)">
       <rect width="436" height="40" rx="12" class="chip"/>
       <text x="16" y="26" class="text" style="font-size:14px">
-        Status: <tspan fill="#22C55E" font-weight="700">Contained</tspan> • Total Duration: <tspan fill="#E5E7EB">00:38:21</tspan>
+        Status: <tspan fill="#22C55E" font-weight="700">New</tspan> • Total Duration: <tspan fill="#E5E7EB">00:38:21</tspan>
       </text>
     </g>
   </g>
@@ -64,7 +64,7 @@
       <g transform="translate(330,0)"><circle cx="0" cy="24" r="8" fill="#FB923C"/><text x="-16" y="54" class="text" style="font-size:12px">11:49 En-Route</text></g>
       <g transform="translate(470,0)"><circle cx="0" cy="24" r="8" fill="#F59E0B"/><text x="-14" y="54" class="text" style="font-size:12px">11:53 Arrive</text></g>
       <g transform="translate(610,0)"><circle cx="0" cy="24" r="8" fill="#F59E0B"/><text x="-28" y="54" class="text" style="font-size:12px">11:56 Suppression</text></g>
-      <g transform="translate(800,0)"><circle cx="0" cy="24" r="8" class="badge-ok"/><text x="-26" y="54" class="text" style="font-size:12px">12:20 Contained</text></g>
+      <g transform="translate(800,0)"><circle cx="0" cy="24" r="8" class="badge-ok"/><text x="-26" y="54" class="text" style="font-size:12px">12:20 New</text></g>
     </g>
 
     <!-- Resource Usage -->

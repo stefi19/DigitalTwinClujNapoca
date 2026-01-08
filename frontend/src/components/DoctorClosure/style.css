@@ -1,10 +1,66 @@
 .doctor {
-    background-color: #ffffff;
-    display: flex;
-    min-height: 832px;
-    min-width: 1280px;
-    overflow: hidden;
-    width: 100%;
+        /* keep layout but do not force a white background; closure page will set dark theme */
+        display: flex;
+        min-height: 832px;
+        min-width: 1280px;
+        overflow: hidden;
+        width: 100%;
+        background: transparent;
+}
+
+/* Closure page layout — align with DoctorDetailed visual system */
+.doctor.closure-page { box-sizing: border-box; padding: 16px; display: flex; gap: 16px; }
+
+.closure-sidebar{
+    width:320px; max-width:40%; background: var(--panel-bg); border-radius:8px; padding:12px; display:flex; flex-direction:column; border:1px solid #334155; box-sizing:border-box;
+}
+.closure-title{ margin:0 0 8px 0; color:var(--text); font-size:16px }
+.closure-list{ overflow:auto; max-height:72vh; padding-top:6px; list-style:none; margin:0; padding-left:0 }
+.closure-item{ padding:10px; border-radius:6px; margin-bottom:8px; cursor:pointer; border:1px solid transparent; background: transparent }
+.closure-item:hover{ background: rgba(59,130,246,0.04); border-color: rgba(59,130,246,0.06) }
+.closure-item.selected{ background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.12) }
+.closure-key{ font-weight:700; color:var(--text) }
+.closure-sub, .closure-loc{ font-size:13px; color:var(--muted) }
+
+.closure-main{ flex:1; min-width:220px }
+.closure-grid{ display:grid; grid-template-columns: 1fr 320px; gap:16px }
+.closure-details{ background: var(--panel-bg); padding:16px; border-radius:8px; border:1px solid #334155 }
+.closure-heading{ margin:0 0 8px 0; color:var(--text) }
+.muted{ color:var(--muted) }
+.section-title{ margin-top:14px; margin-bottom:8px; color:var(--muted); font-size:14px }
+
+/* Colored centered dividers for the summary-like paragraphs */
+.closure-details p.muted{ border-top:2px solid var(--accent-yellow); padding:10px 0; margin:10px 0; text-align:center; color:var(--text) }
+.closure-details p.muted:first-of-type{ border-top:none; padding-top:0; margin-top:0; text-align:left; color:var(--text) }
+
+/* Treatment log should span the full width under both panels and be scrollable */
+.treatment-log{ grid-column:1 / span 2; display:flex; flex-direction:column; gap:8px; width:100%; max-height: calc(72vh - 200px); overflow:auto; margin-top:6px }
+.treatment-event{ display:flex; gap:12px; align-items:flex-start; padding:10px; border-radius:6px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02); width:100% }
+.event-time{ min-width:90px; color:var(--muted); font-size:13px }
+.event-body{ color:var(--text); font-size:14px; flex:1; white-space:normal }
+
+.closure-incident{ background: var(--panel-bg); padding:12px; border-radius:8px; border:1px solid #334155 }
+.closure-incident{ background: var(--panel-bg); padding:12px; border-radius:8px; border:1px solid #334155; box-sizing:border-box; position:relative; overflow:hidden; display:flex; flex-direction:column; min-height:160px; z-index:1 }
+.actions{ display:flex; gap:8px; margin-top:12px; align-items:center; justify-content:flex-end; flex-wrap:wrap; margin-left:0 }
+.actions { margin-top: auto }
+.btn{ padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); cursor:pointer; transition:transform .12s ease, box-shadow .14s ease; box-shadow: 0 1px 0 rgba(2,6,23,0.06); font-weight:600; background:transparent; color:var(--text); font-size:13px; display:inline-flex; align-items:center; gap:8px }
+
+/* Footer actions that span the whole closure view */
+.closure-actions-footer{ grid-column:1 / span 2; display:flex; justify-content:flex-end; padding:12px 0 0 0; margin-top:8px }
+.closure-actions-footer .actions{ background:transparent; padding:0 }
+.closure-actions-footer .btn{ margin-left:8px }
+.btn:hover{ transform:translateY(-2px); box-shadow: 0 10px 30px rgba(2,6,23,0.12) }
+.btn.primary{ padding:8px 14px; background: linear-gradient(90deg,#2563eb,#06b6d4); color:#fff; border-color:transparent }
+
+/* Ensure buttons never overflow their parent on narrow screens */
+.closure-incident .actions .btn{ max-width:100%; box-sizing:border-box }
+.closure-grid{ align-items:start }
+
+
+@media (max-width: 800px) {
+    .doctor.closure-page{ flex-direction:column }
+    .closure-sidebar{ width:100%; max-width:none }
+    .closure-grid{ grid-template-columns: 1fr }
 }
 
 .doctor .svg-ui-flux-pacient {
@@ -398,6 +454,66 @@
     font-size: 14px;
     font-weight: 400;
     height: 11.76%;
+
+/* Closure page specific styles */
+.closure-page { display: flex; height: 100vh; width: 100%; background: #041728; font-family: "Montserrat-Regular", Helvetica; }
+.doctor.closure-page { background: linear-gradient(180deg,#02101a 0%, #041728 100%) !important; }
+.closure-sidebar {
+    width: 360px;
+    padding: 20px;
+    background: linear-gradient(180deg,#021226 0%, #041428 100%);
+    color: #cbd5e1;
+    overflow-y: auto;
+    border-right: 1px solid rgba(255,255,255,0.04);
+}
+.closure-title { color: #e6f3ff; margin-top: 0; font-size: 18px; }
+.muted { color: #9aa8bf; }
+.closure-list { list-style: none; padding: 0; margin: 12px 0 0 0; }
+.closure-item {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    cursor: pointer;
+}
+.closure-item.selected { background: rgba(34,211,238,0.06); }
+.closure-key { font-weight: 700; color: #e6f3ff; }
+.closure-sub { font-size: 13px; color: #9aa8bf; }
+.closure-loc { font-size: 12px; color: #7f8a9b; }
+
+.closure-main { flex: 1; padding: 20px; overflow-y: auto; background: transparent; }
+.closure-grid { display: flex; gap: 20px; }
+.closure-details { flex: 1; background: linear-gradient(180deg,#021726,#05182a); padding: 18px; border-radius: 10px; color: #cbd5e1; box-shadow: 0 10px 40px rgba(2,6,23,0.6); }
+.closure-heading { color: #e6f3ff; margin: 0 0 8px 0; }
+.section-title { color: #e6f3ff; margin-top: 12px; }
+.treatment-log { background:#06101a; padding: 12px; border-radius: 6px; }
+.treatment-event { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.treatment-event:last-child { border-bottom: none; }
+.event-time { color: #e6f3ff; font-weight: 700; }
+.event-body { color: #9aa8bf; }
+
+.closure-incident { width: 420px; background: linear-gradient(180deg,#021726,#05182a); padding: 16px; border-radius: 10px; color: #cbd5e1; box-shadow: 0 10px 40px rgba(2,6,23,0.6); }
+.actions { margin-top: 12px; display: flex; gap: 8px; }
+.btn { background: linear-gradient(180deg,#041224,#07142a); color: #cbd5e1; padding: 10px 14px; border-radius: 8px; border: none; cursor: pointer; font-weight:700 }
+.btn.primary { color: #e6f3ff; background: linear-gradient(180deg,#0ea5a4,#036b6a); box-shadow: 0 6px 18px rgba(14,165,164,0.12); }
+
+/* small screens */
+@media (max-width: 900px) {
+    .closure-page { flex-direction: column; }
+    .closure-sidebar { width: 100%; }
+    .closure-incident { width: 100%; }
+    .closure-grid { flex-direction: column; }
+}
+
+/* subtle typography & spacing tweaks to match Doctor pages */
+.closure-title { font-family: "Montserrat-Bold", Helvetica; font-size: 18px; }
+.closure-key { font-family: "Montserrat-Bold", Helvetica; }
+.closure-sub, .closure-loc, .muted, .event-body { font-family: "Montserrat-Regular", Helvetica; }
+
+/* Make text slightly brighter for better contrast in dark mode */
+.closure-sidebar, .closure-main, .closure-details, .closure-incident { color: #d7e6f3; }
+.closure-loc { color: #9fb0c3; }
+.closure-sub { color: #a7bdcf; }
+.muted { color: #9aa8bf; }
+.closure-key { color: #e6f3ff; }
     left: 48.85%;
     letter-spacing: 0;
     line-height: normal;
@@ -1239,3 +1355,270 @@
     white-space: nowrap;
     width: 46.15%;
 }
+
+/* Polished dark-mode UI tweaks for Doctor Closure */
+:root {
+    --bg-900: #02101a;
+    --bg-800: #041728;
+    --panel: linear-gradient(180deg,#021726,#05182a);
+    --muted: #9aa8bf;
+    --text: #d7e6f3;
+    --accent: #06b6d4;
+    --accent-2: #0ea5a4;
+    --divider: rgba(255,255,255,0.04);
+}
+
+.closure-sidebar { padding: 24px; }
+.closure-list { margin-top: 14px; }
+.closure-item {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+    transition: background .12s ease, transform .08s ease;
+    display: flex;
+    flex-direction: column;
+}
+.closure-item:hover { background: rgba(6,182,212,0.03); transform: translateY(-2px); }
+.closure-item.selected { background: linear-gradient(90deg, rgba(6,182,212,0.06), transparent); box-shadow: 0 8px 30px rgba(3,14,23,0.6); }
+.closure-key { font-size: 14px; letter-spacing: .2px; }
+.closure-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.closure-loc { font-size: 12px; color: #8398ad; margin-top: 6px; }
+
+/* make the panels look like cards with subtle separators */
+.closure-details, .closure-incident { border: 1px solid rgba(255,255,255,0.03); }
+.section-title { position: relative; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+/* treatment log timeline */
+.treatment-log { position: relative; }
+.treatment-event { padding: 10px 0; display:flex; gap:12px; align-items:flex-start; }
+.treatment-event::before { content: ''; width:10px; height:10px; border-radius:50%; background:var(--accent); margin-top:6px; box-shadow: 0 0 0 4px rgba(6,182,212,0.06); flex:0 0 18px }
+.treatment-event .event-time { font-size:12px; color:var(--muted); }
+.treatment-event .event-body { color:var(--text); }
+
+/* actions */
+.actions .btn { padding:10px 16px; }
+.btn.primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(14,165,164,0.14); }
+
+/* nice thin scrollbar in dark theme */
+.closure-sidebar::-webkit-scrollbar, .closure-main::-webkit-scrollbar { width: 10px; height: 10px }
+.closure-sidebar::-webkit-scrollbar-thumb, .closure-main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px }
+.closure-sidebar::-webkit-scrollbar-track, .closure-main::-webkit-scrollbar-track { background: transparent }
+
+/* responsive tweaks */
+@media (max-width: 1100px) {
+    .closure-incident { width: 360px; }
+}
+
+@media (max-width: 700px) {
+    .closure-sidebar { padding: 12px; }
+    .closure-grid { gap: 12px; }
+}
+
+/* Additional enhancements for better look */
+.closure-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 10px 10px 0 0;
+}
+
+.closure-details::before, .closure-incident::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 10px 10px 0 0;
+}
+
+.closure-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity .12s ease;
+}
+
+.closure-item:hover::after { opacity: 0.5; }
+
+.treatment-event::before {
+    content: '●';
+    color: var(--accent);
+    font-size: 12px;
+    margin-right: 8px;
+    position: relative;
+    top: -2px;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity .15s ease;
+    border-radius: 8px;
+}
+
+.btn:hover::before { opacity: 1; }
+
+.closure-heading::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 2px;
+    background: var(--accent);
+    margin-top: 4px;
+    border-radius: 1px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: var(--accent);
+}
+
+.closure-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.closure-list::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 3px;
+}
+
+.closure-list::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+}
+
+/* Animation for selected item */
+.closure-item.selected {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 8px 30px rgba(3,14,23,0.6); }
+    50% { box-shadow: 0 8px 30px rgba(6,182,212,0.3); }
+    100% { box-shadow: 0 8px 30px rgba(3,14,23,0.6); }
+}
+
+/* Better responsive design */
+@media (max-width: 1200px) {
+    .closure-incident { width: 380px; }
+}
+
+@media (max-width: 700px) {
+    .closure-sidebar { padding: 16px; }
+    .closure-main { padding: 16px; }
+    .closure-grid { gap: 16px; }
+    .closure-item { padding: 12px 8px; }
+}
+
+/* --- Visual polish: unified variables and refined spacing --- */
+:root {
+    --bg-primary: linear-gradient(135deg, #071226 0%, #17102a 100%);
+    --bg-panel: rgba(10,17,37,0.85);
+    --accent: #06b6d4;
+    --accent-strong: #0891b2;
+    --text: #e6eef6;
+    --muted: #9aa8bd;
+    --panel-border: rgba(255,255,255,0.04);
+}
+
+.doctor.closure-page {
+    background: var(--bg-primary);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    gap: 24px;
+}
+
+.closure-sidebar {
+    width: 320px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--panel-border);
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 0 16px 16px 0;
+}
+
+.closure-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.closure-list { max-height: calc(100vh - 140px); }
+
+.closure-item {
+    padding: 14px 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+
+.closure-item:hover { transform: translateY(-3px); }
+
+.closure-key { font-size: 14px; font-weight: 700; color: var(--text); }
+.closure-sub, .closure-loc { color: var(--muted); font-size: 12px; }
+
+.closure-main {
+    flex: 1;
+    padding: 28px;
+    overflow-y: auto;
+}
+
+.closure-grid { display:grid; grid-template-columns: 1fr 360px; gap: 28px; align-items:start; }
+.closure-details { background: transparent; }
+.closure-incident { background: var(--bg-panel); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); }
+
+.actions { margin-top: 16px; display:flex; gap:10px; }
+.btn { padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); background: transparent; color: var(--text); cursor: pointer; }
+.btn.primary { background: var(--accent); color: #07202a; border-color: transparent; }
+.btn:active { transform: translateY(0); }
+
+@media (max-width: 1100px) {
+    .closure-grid { grid-template-columns: 1fr; }
+    .closure-incident { order: 2; }
+}
+
+/* Layout helpers similar to DoctorDetailed */
+.closure-details .row { display:flex; gap:12px; align-items:flex-start; margin-bottom:12px }
+.closure-details .label { width:140px; color:var(--muted); font-size:14px }
+.closure-details .value { flex:1; color:var(--text); font-size:14px }
+
+.closure-heading { font-size:20px; margin:0 0 8px 0; color:var(--text) }
+.section-title { position:relative; margin:18px 0 8px 0; color:var(--text); font-size:16px }
+
+.treatment-log { background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); padding:12px; border-radius:8px }
+.treatment-event { display:flex; gap:12px; padding:8px 6px; border-bottom:1px dashed rgba(255,255,255,0.03) }
+.treatment-event:last-child { border-bottom: none }
+.event-time { width:140px; color:var(--muted); font-size:13px }
+.event-body { color:var(--text); font-size:14px }
+
+/* subtle separators inside main */
+.closure-details > .section { padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.02) }
+.closure-details > .section:last-child { border-bottom: none }
+
+/* ensure consistent typography and line-heights */
+.closure-main, .closure-details, .closure-incident { font-family: Inter, Roboto, -apple-system, system-ui, 'Segoe UI', Arial; line-height:1.4 }

@@ -9,6 +9,7 @@ from confluent_kafka import Producer
 from .db import SessionLocal
 from .models import Incident as IncidentModel
 from .broadcast import broadcaster
+from .utils import enrich_incident
 
 # simple in-memory store for incidents (kept for backward compatibility)
 incidents_store: List[dict] = []
@@ -68,8 +69,8 @@ def on_message(client, userdata, msg):
     try:
         payload = msg.payload.decode()
         data = json.loads(payload)
-        data["received_at"] = datetime.utcnow().isoformat()
-        data.setdefault("status", "new")
+        # enrich incoming incident so UI has required fields
+        data = enrich_incident(data)
         print("Received incident", data)
 
         # persist to DB
@@ -78,11 +79,18 @@ def on_message(client, userdata, msg):
             inc = IncidentModel(
                 id=data.get("id"),
                 type=data.get("type"),
-                lat=float(data.get("lat")),
-                lon=float(data.get("lon")),
-                severity=int(data.get("severity")),
+                lat=float(data.get("lat") or 0),
+                lon=float(data.get("lon") or 0),
+                severity=int(data.get("severity") or 1),
                 status=data.get("status", "new"),
                 notes=data.get("notes"),
+                patient_name=data.get("patient_name"),
+                patient_age=data.get("patient_age"),
+                patient_contact=data.get("patient_contact"),
+                address=data.get("address"),
+                contact=data.get("contact"),
+                sensor_id=data.get("sensor_id"),
+                sensor_type=data.get("sensor_type"),
                 received_at=datetime.fromisoformat(data.get("received_at")),
                 updated_at=datetime.utcnow()
             )
