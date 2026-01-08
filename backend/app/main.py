@@ -400,6 +400,27 @@ def update_incident_status(incident_id: str, new_status: str):
                     break
             
             broadcaster.publish(result)
+            # If the incident was resolved, create a Closure record so Doctor Closure UI
+            # will show it in the closures list. We create a lightweight closure entry
+            # with an auto-generated id and a short treatment_log indicating auto-resolve.
+            try:
+                if new_status == 'resolved':
+                    db2 = SessionLocal()
+                    existing = db2.query(ClosureModel).filter(ClosureModel.incident_id == incident_id).first()
+                    if not existing:
+                        closure_id = str(uuid.uuid4())
+                        closure = ClosureModel(id=closure_id, incident_id=incident_id, closed_by='system', summary='Auto-resolved on ambulance arrival', treatment_log=json.dumps([{'time': datetime.utcnow().isoformat(), 'action': 'auto-resolve', 'details': 'Ambulance reported arrival and incident auto-resolved.'}]))
+                        db2.add(closure)
+                        db2.commit()
+                        try:
+                            # optionally broadcast closure creation for live UIs
+                            broadcaster.publish({'resource': 'closure', 'closure': closure.to_dict()})
+                        except Exception:
+                            pass
+                    db2.close()
+            except Exception as e:
+                print('Failed to create closure record after resolve', e)
+
             return {'ok': True, 'incident': result}
         else:
             db.close()
