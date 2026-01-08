@@ -40,6 +40,11 @@
 /* Mapbox requires the canvas to be absolutely positioned so it fills the container. */
 .mapboxgl-canvas { position: absolute !important; top: 0 !important; left: 0 !important; z-index: 10001 !important; }
 
+/* Ensure DOM markers (ambulance DOM markers) sit above the canvas. Markers are
+	rendered as DOM elements with class 'mapboxgl-marker' — increase their
+	stacking context so they remain visible above the canvas overlay. */
+.mapboxgl-marker { position: relative !important; z-index: 10002 !important; }
+
 /* debug aid: uncomment border for visual debugging
 .map-container { outline: 3px solid rgba(0,255,0,0.25); } */
 
