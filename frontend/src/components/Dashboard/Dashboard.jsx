@@ -10,6 +10,8 @@ export default function Dashboard() {
   const [ambulances, setAmbulances] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dailyStats, setDailyStats] = useState(null);
+  const [totalIncidentsCount, setTotalIncidentsCount] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -20,6 +22,16 @@ export default function Dashboard() {
         ]);
         setAmbulances(aRes.data || []);
         setIncidents(iRes.data || []);
+        // fetch daily stats for the Dashboard panel
+        try {
+          const sRes = await axios.get('/stats/daily');
+          setDailyStats(sRes.data || null);
+        } catch (e) { console.warn('Failed to load daily stats', e); }
+        // fetch total incidents count (uncapped)
+        try {
+          const cRes = await axios.get('/incidents/count');
+          setTotalIncidentsCount(cRes.data?.total ?? null);
+        } catch (e) { console.warn('Failed to load incidents count', e); }
       } catch (err) {
         console.warn('Dashboard load failed', err);
       } finally {
@@ -216,7 +228,42 @@ export default function Dashboard() {
         </div>
         <div className="card">
           <div className="card-title">Total Incidents (history)</div>
-          <div className="card-value">{incidents.length}</div>
+          <div className="card-value">{totalIncidentsCount !== null ? totalIncidentsCount : incidents.length}</div>
+        </div>
+      </div>
+
+      {/* Daily stats panel: totals and small hourly chart */}
+      <div className="dashboard-stats" style={{display:'flex',gap:12,alignItems:'stretch',padding:'12px 14px'}}>
+        <div style={{flex:'0 0 260px',background:'var(--panel)',padding:12,borderRadius:8}}>
+          <div style={{fontSize:12,color:'var(--muted)'}}>Incidents Today</div>
+          <div style={{fontSize:28,fontWeight:700}}>{dailyStats ? dailyStats.total : '—'}</div>
+          <div style={{marginTop:8,fontSize:13}}>
+            {dailyStats && dailyStats.by_type ? Object.entries(dailyStats.by_type).map(([k,v]) => (
+              <div key={k} style={{display:'flex',justifyContent:'space-between'}}><div style={{textTransform:'capitalize'}}>{k}</div><div>{v}</div></div>
+            )) : <div className="muted">No data</div>}
+          </div>
+        </div>
+        <div style={{flex:1,background:'var(--panel)',padding:12,borderRadius:8}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div style={{fontSize:13,fontWeight:700}}>Incidents by hour (UTC)</div>
+            <div style={{fontSize:12,color:'var(--muted)'}}>{dailyStats ? dailyStats.date : ''}</div>
+          </div>
+          <div style={{height:84,marginTop:8}}>
+            {dailyStats ? (
+              <svg width="100%" height="84" viewBox="0 0 800 84" preserveAspectRatio="none">
+                {(() => {
+                  const hourly = dailyStats.hourly || Array(24).fill(0);
+                  const max = Math.max(1, ...hourly);
+                  const w = 800 / 24;
+                  return hourly.map((v, i) => {
+                    const h = Math.round((v / max) * 72);
+                    const x = i * w;
+                    return <rect key={i} x={x+2} y={84 - h - 6} width={Math.max(4, w-4)} height={h} fill="#60a5fa" opacity={0.9} />
+                  });
+                })()}
+              </svg>
+            ) : <div className="muted">Daily stats not available</div>}
+          </div>
         </div>
       </div>
 

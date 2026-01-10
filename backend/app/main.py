@@ -130,7 +130,7 @@ async def simulate_ambulance(amb_id: str):
                     amb = db.query(AmbulanceModel).filter(AmbulanceModel.id == amb_id).first()
                     await asyncio.sleep(tick_s)
 
-                # arrival: set final position and mark arrived
+                # arrival: set final position and mark arrived, then free the unit
                 amb = db.query(AmbulanceModel).filter(AmbulanceModel.id == amb_id).first()
                 if amb:
                     amb.lat = amb.target_lat
@@ -140,14 +140,38 @@ async def simulate_ambulance(amb_id: str):
                     db.commit()
                     broadcaster.publish(amb.to_dict())
                     try:
-                        inc = db.query(IncidentModel).filter(IncidentModel.id == amb.incident_id).order_by(IncidentModel.received_at.desc()).first()
-                        if inc:
-                            inc.status = 'in_progress'
-                            inc.updated_at = datetime.utcnow()
-                            db.commit()
-                            broadcaster.publish(inc.to_dict())
-                    except Exception:
-                        db.rollback()
+                        # When ambulance arrives, mark the incident as resolved so it
+                        # moves into the Doctor Closure workflow. Use the helper to
+                        # ensure closures are created and broadcasts happen.
+                        if amb.incident_id:
+                            update_incident_status(amb.incident_id, 'resolved')
+                            # Wait briefly to allow UIs to receive the 'arrived' event
+                            # and react before we free the unit. This reduces races
+                            # where the frontend never sees 'arrived' and cannot
+                            # auto-resolve or show the arrived state.
+                            try:
+                                await asyncio.sleep(2)
+                            except Exception:
+                                pass
+                            # After a short delay, free the ambulance so it returns
+                            # to the available pool. Clear assignment-related fields
+                            # and broadcast the updated ambulance state.
+                            amb_ref = db.query(AmbulanceModel).filter(AmbulanceModel.id == amb_id).first()
+                            if amb_ref:
+                                amb_ref.status = 'idle'
+                                amb_ref.incident_id = None
+                                amb_ref.target_lat = None
+                                amb_ref.target_lon = None
+                                amb_ref.route = None
+                                amb_ref.eta = None
+                                # keep started_at for history or clear if you prefer
+                                db.commit()
+                                try:
+                                    broadcaster.publish(amb_ref.to_dict())
+                                except Exception:
+                                    pass
+                    except Exception as e:
+                        print('Failed to mark incident resolved on arrival', e)
 
             else:
                 # fallback linear movement
@@ -162,12 +186,23 @@ async def simulate_ambulance(amb_id: str):
                         broadcaster.publish(payload)
 
                         try:
-                            inc = db.query(IncidentModel).filter(IncidentModel.id == amb.incident_id).order_by(IncidentModel.received_at.desc()).first()
-                            if inc:
-                                inc.status = 'in_progress'
-                                inc.updated_at = datetime.utcnow()
-                                db.commit()
-                                broadcaster.publish(inc.to_dict())
+                            # When close enough, resolve the incident and free the unit
+                            if amb.incident_id:
+                                update_incident_status(amb.incident_id, 'resolved')
+                                # free ambulance
+                                amb_ref = db.query(AmbulanceModel).filter(AmbulanceModel.id == amb_id).first()
+                                if amb_ref:
+                                    amb_ref.status = 'idle'
+                                    amb_ref.incident_id = None
+                                    amb_ref.target_lat = None
+                                    amb_ref.target_lon = None
+                                    amb_ref.route = None
+                                    amb_ref.eta = None
+                                    db.commit()
+                                    try:
+                                        broadcaster.publish(amb_ref.to_dict())
+                                    except Exception:
+                                        pass
                         except Exception:
                             db.rollback()
 
@@ -291,6 +326,25 @@ def get_incidents(status: Optional[str] = Query(None, description="Filter by sta
         if status:
             return [inc for inc in incidents_store if inc.get('status') == status]
         return incidents_store
+
+
+@app.get('/incidents/count')
+def get_incidents_count():
+    """Return total number of incidents in the database (best-effort).
+
+    Useful for dashboards that want to show overall counts instead of the
+    limited result set returned by /incidents (which is capped at 500).
+    """
+    try:
+        db = SessionLocal()
+        count = db.query(IncidentModel).count()
+        db.close()
+        return {'total': int(count)}
+    except Exception as e:
+        print('Failed to count incidents', e)
+        traceback.print_exc()
+        # fall back to in-memory store length
+        return {'total': len(incidents_store)}
 
 
 
@@ -861,6 +915,50 @@ def get_ml_risk(grid_km: float = Query(3.0, description="half-extent of grid aro
         print('Failed to compute ML risk', e)
         traceback.print_exc()
         return JSONResponse({'ok': False, 'error': str(e)}, status_code=500)
+
+
+@app.get('/stats/daily')
+def get_daily_stats(date: Optional[str] = Query(None, description="YYYY-MM-DD date in UTC, defaults to today")):
+    """Return simple daily statistics for incidents: total, counts by type, and hourly series (UTC).
+
+    Useful for rendering a small summary and chart on the Dashboard.
+    """
+    try:
+        if date:
+            try:
+                day = datetime.fromisoformat(date).date()
+            except Exception:
+                day = datetime.strptime(date.split('T')[0], '%Y-%m-%d').date()
+        else:
+            day = datetime.utcnow().date()
+
+        start_dt = datetime.combine(day, datetime.min.time())
+        end_dt = start_dt + timedelta(days=1)
+
+        db = SessionLocal()
+        rows = db.query(IncidentModel).filter(IncidentModel.received_at >= start_dt, IncidentModel.received_at < end_dt).all()
+        total = len(rows)
+        by_type = {}
+        hourly = [0] * 24
+        for r in rows:
+            t = (r.type or 'unknown').lower()
+            by_type[t] = by_type.get(t, 0) + 1
+            if r.received_at:
+                h = r.received_at.hour
+            else:
+                h = 0
+            hourly[h] += 1
+        db.close()
+        return {
+            'date': day.isoformat(),
+            'total': total,
+            'by_type': by_type,
+            'hourly': hourly
+        }
+    except Exception as e:
+        print('Failed to compute daily stats', e)
+        traceback.print_exc()
+        return {'date': None, 'total': 0, 'by_type': {}, 'hourly': [0]*24}
 
 
 @app.get('/ml/risk/centroids')

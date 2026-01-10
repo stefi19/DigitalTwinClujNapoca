@@ -60,6 +60,25 @@ export const DoctorClosure = () => {
             }
         }
         load();
+        // Listen for closure creation events from the SSE stream so the
+        // Doctor Closure view updates live when new closures are auto-created.
+        let es;
+        try {
+            if (typeof window !== 'undefined' && typeof window.EventSource !== 'undefined') {
+                es = new EventSource('/stream/incidents');
+                es.onmessage = (e) => {
+                    try {
+                        const data = JSON.parse(e.data);
+                        if (data && data.resource === 'closure') {
+                            // refresh list when a closure event arrives
+                            load();
+                        }
+                    } catch (err) { /* ignore parse errors */ }
+                };
+                es.onerror = () => { try { es.close(); } catch(e){} };
+            }
+        } catch (err) { /* ignore SSE setup errors */ }
+        return () => { try { if (es && typeof es.close === 'function') es.close(); } catch(e){} };
     }, []);
 
     const selected = reports.find(r => r.closure.incident_id === selectedId);

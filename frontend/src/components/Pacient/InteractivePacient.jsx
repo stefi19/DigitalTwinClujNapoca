@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './pacient-style.css';
 import ambulanceSvg from './Ambulance15.svg';
+import { useNavigate } from 'react-router-dom';
 
 // Simple haversine distance (meters)
 function haversine([lon1, lat1], [lon2, lat2]) {
@@ -16,9 +17,11 @@ function haversine([lon1, lat1], [lon2, lat2]) {
 }
 
 export default function InteractivePacient() {
+  const navigate = useNavigate();
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const ambulanceMarkerRef = useRef(null);
+  const resolvedIncidentsRef = useRef(new Set());
   const routeLayerId = 'route-line';
 
   // Defaults inside Cluj-Napoca
@@ -360,6 +363,79 @@ export default function InteractivePacient() {
   // keep a ref to the latest startDispatch so event listener can call it
   useEffect(() => { startDispatchRef.current = startDispatch; }, [startDispatch]);
 
+  // detect arrival: when selected ambulance reaches patient (or ETA reaches 0)
+  useEffect(() => {
+    // only act when a specific ambulance is selected
+    if (!selectedAmb) return;
+
+    const checkAndResolve = async () => {
+      try {
+        const amb = ambulances.find(a => a.ambulance_id === selectedAmb);
+        if (!amb) return;
+        const incidentId = amb.incident_id; // require explicit incident association
+        if (!incidentId) {
+          // no incident assigned to this ambulance — do nothing
+          return;
+        }
+
+        // avoid duplicate resolves
+        if (resolvedIncidentsRef.current.has(incidentId)) return;
+
+        const metersThreshold = 25; // treat <25m as arrival
+        const currentLng = ambulanceLng || amb.lon || 0;
+        const currentLat = ambulanceLat || amb.lat || 0;
+        const dist = haversine([currentLng, currentLat], [patientLng, patientLat]);
+
+        const arrived = (eta === 0) || (typeof eta === 'number' && eta <= 1) || (dist <= metersThreshold);
+        if (!arrived) return;
+
+        // verify the incident actually corresponds to this patient location before resolving
+        try {
+          const caseRes = await fetch(`/cases/${incidentId}`);
+          if (!caseRes.ok) {
+            console.warn('Could not fetch case to verify before resolve', incidentId);
+            return;
+          }
+          const caseData = await caseRes.json();
+          const incLat = Number(caseData.lat || caseData.latitude || 0);
+          const incLon = Number(caseData.lon || caseData.longitude || 0);
+          const incidentDist = haversine([incLon, incLat], [patientLng, patientLat]);
+          // if incident location is far from current patient coords, skip auto-resolve
+          if (incidentDist > 100) { // 100m threshold for safety
+            console.warn('Incident location differs from patient; skipping auto-resolve', incidentId, incidentDist);
+            return;
+          }
+        } catch (err) {
+          console.warn('Failed to verify incident before resolve', err);
+          return;
+        }
+
+        // mark as resolving to avoid races
+        resolvedIncidentsRef.current.add(incidentId);
+
+        // call backend to mark incident resolved
+        try {
+          const res = await fetch(`/incidents/${incidentId}/resolve`, { method: 'POST' });
+          if (res.ok) {
+            // optimistic UI: mark ambulance/incidents locally as resolved/arrived
+            setAmbulances(prev => prev.map(p => p.ambulance_id === amb.ambulance_id ? { ...p, status: 'arrived' } : p));
+            // navigate doctor to closure view so they can finalize
+            try { navigate('/doctor/closure'); } catch (e) { /** ignore navigation errors */ }
+            try { alert(`Incident ${incidentId} marked resolved. Please finalize closure in Doctor Closure.`); } catch(e){}
+          } else {
+            resolvedIncidentsRef.current.delete(incidentId);
+            console.warn('Failed to resolve incident', incidentId, await res.text().catch(()=>'<no-body>'));
+          }
+        } catch (err) {
+          resolvedIncidentsRef.current.delete(incidentId);
+          console.warn('Error calling resolve endpoint', err);
+        }
+      } catch (err) { console.warn('arrival detection error', err); }
+    };
+
+    checkAndResolve();
+  }, [selectedAmb, ambulanceLat, ambulanceLng, eta, ambulances, patientLat, patientLng, navigate]);
+
   // tick every second to force re-render so distances/ETAs recompute in real-time for all units
   useEffect(() => {
     const iv = setInterval(() => setTick(t => t + 1), 1000);
@@ -617,8 +693,12 @@ export default function InteractivePacient() {
                 <div style={{width:70,textAlign:'right'}}>ETA</div>
                 <div style={{width:80,textAlign:'right'}}>Status</div>
               </div>
-              {(
-             (showOnlyEnroute ? ambulances.filter(a => a.status === 'enroute') : ambulances)
+              {( 
+                // If the user has 'Show only en-route units' enabled we still want to
+                // show the currently selected ambulance so the UI doesn't disappear
+                // when it transitions to 'arrived'. Include selectedAmb regardless
+                // of its status.
+                (showOnlyEnroute ? ambulances.filter(a => a.status === 'enroute' || a.ambulance_id === selectedAmb) : ambulances)
               ).map(a => {
                 const isSelected = selectedAmb === a.ambulance_id;
                 let distStr = '—';
@@ -682,7 +762,9 @@ export default function InteractivePacient() {
                     <div style={{flex:1,fontSize:13}}>{a.unit_name || a.ambulance_id}<div style={{fontSize:11,color:'#666'}}>{a.unit_type || 'ambulance'}</div></div>
                     <div style={{width:90,textAlign:'right',fontSize:13}}>{distStr}</div>
                     <div style={{width:70,textAlign:'right',fontSize:13}}>{etaStr}</div>
-                    <div style={{width:80,textAlign:'right',fontSize:13,color: a.status === 'enroute' ? '#06b6d4' : '#666'}}>{a.status || 'idle'}</div>
+                    <div style={{width:80,textAlign:'right',fontSize:13,color: a.status === 'enroute' ? '#06b6d4' : (a.status === 'arrived' ? '#10B981' : '#666')}}>
+                      {a.status === 'arrived' ? 'Arrived' : (a.status || 'idle')}
+                    </div>
                   </div>
                 );
               })}
